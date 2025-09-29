@@ -1,2 +1,2 @@
-# Python-2
-Chall
+# Challenge-python
+Iniciando o codigo em python sobre o Challenge Hc
