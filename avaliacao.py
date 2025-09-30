@@ -17,18 +17,18 @@ def create_avaliacao(id_avaliacao, nota, comentario, data_avaliacao, id_lembrete
     try:
         cursor = conn.cursor() #obter um cursor
         sql = """
-            INSERT INTO avaliacoes (id_avaliacao, nota, comentario, data_avaliacao, id_lembrete, , , , )
-            VALUES (:id_avaliacao, :nota, :comentario, :data_avaliacao, :id_lembrete, :, :, :, :)
+            INSERT INTO avaliacoes (id_avaliacao, nota, comentario, data_avalicao, id_lembrete)
+            VALUES (:id_avaliacao, :nota, :comentario, :data_avalicao, :id_lembrete)
         """
         cursor.execute(sql, {
             'id_avaliacao' : id_avaliacao,
             'nota' : nota,
             'comentario' : comentario,
-            'data_avaliacao' : data_avaliacao,
+            'data_avalicao' : data_avaliacao,
             'id_lembrete' : id_lembrete
         })
         conn.commit()
-        print(f' A avaliação de ID: {id_avaliacao}, nota: {nota}, comentario: {comentario}, data_avaliacao: {data_avaliacao} e id_lembrete: {id_lembrete} foi adicionado com sucesso!')
+        print(f' A avaliação de ID: {id_avaliacao}, nota: {nota}, comentario: {comentario}, data_avalicao: {data_avaliacao} e id_lembrete: {id_lembrete} foi adicionado com sucesso!')
     except oracledb.Error as e:
         print(f'\nErro ao inserir avaliação: {e}')
         conn.rollback()
@@ -46,14 +46,14 @@ def read_avaliacao():
     try:
         cursor = conn.cursor()
         sql = """
-            SELECT id_avaliacao, nota , comentario, data_avaliacao, id_lembrete
+            SELECT id_avaliacao, nota, comentario, data_avalicao, id_lembrete
             FROM avaliacoes ORDER BY id_avaliacao
         """
         cursor.execute(sql)
         print("\n --- Lista de avaliações ---")
         rows = cursor.fetchall()
         for row in rows:
-            print(f'ID: {row[0]}, nota: {row[1]}, comentario: {row[2]}, data_avaliacao: {row[3]}, id_lembrete: {row[4]}')
+            print(f'ID: {row[0]}, nota: {row[1]}, comentario: {row[2]}, data_avalicao: {row[3]}, id_lembrete: {row[4]}')
             print('----------------------------------')
     except oracledb.Error as e:
         print(f'\nErro ao ler as avaliações: {e}')
@@ -76,7 +76,7 @@ def update_avaliacao(id_avaliacao, nova_nota, novo_comentario, nova_data_avaliac
         sql = """
 
         UPDATE avaliacoes
-        set nota = :nova_nota, comentario = :novo_comentario, data_avaliacao = :nova_data_avaliacao, id_lembrete = :novo_id_lembrete WHERE id_avaliacao = :id_avaliacao
+        set nota = :nova_nota, comentario = :novo_comentario, data_avalicao = :nova_data_avaliacao, id_lembrete = :novo_id_lembrete WHERE id_avaliacao = :id_avaliacao
         
         """
         cursor.execute(sql, {'nova_nota' : nova_nota, 'novo_comentario' : novo_comentario, 'nova_data_avaliacao' :nova_data_avaliacao, 'id_lembrete' : novo_id_lembrete, 'id_avaliacao': id_avaliacao})
@@ -144,11 +144,11 @@ def main_avaliacao():
 
         opcao=validar_inteiro('Digite uma opção: ')
         if opcao ==1:
-            id_avaliacao = validar_inteiro('ID: ')
-            nota = validar_inteiro('nota: ')
-            comentario = validar_string('comentario: ')
-            data_avaliacao= validar_data('data da avaliacao: ')
-            id_lembrete=validar_inteiro('id do lembrete: ')
+            id_avaliacao = validar_inteiro('Digite o ID avaliação: ')
+            nota = validar_inteiro('Digite a nota da consulta: ')
+            comentario = validar_string('Digite o comentario sobre a consulta: ')
+            data_avaliacao= validar_data('Digite a data da avaliacao: ')
+            id_lembrete=validar_inteiro('Digite o ID do lembrete: ')
             create_avaliacao(id_avaliacao,nota,comentario,data_avaliacao,id_lembrete)
     
         elif opcao==2:

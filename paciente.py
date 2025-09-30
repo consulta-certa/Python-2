@@ -54,7 +54,7 @@ def read_paciente():
         print("\n --- Lista de Pacientes ---")
         rows = cursor.fetchall()
         for row in rows:
-            print(f'ID: {row[0]}, Nome: {row[1]}, Email: {row[2]}, Telefone: {row[3]}, Senha: {row[4]}, Acompanhante: {row[5]}')
+            print(f'ID: {row[0]}, Nome: {row[1]}, Email: {row[2]}, Senha: {row[3]}, Telefone: {row[4]}, Acompanhante: {row[5]}')
             print('----------------------------------')
     except oracledb.Error as e:
         print(f'\nErro ao ler Pacientes: {e}')
@@ -161,8 +161,8 @@ def main_paciente():
             id_paciente = validar_inteiro('Digite o Id do Paciente: ')
             novo_nome = validar_nome('Digite o novo Nome do Paciente: ')
             novo_email = validar_email('Digite o novo email do Paciente: ')
-            novo_telefone = validar_telefone('Digite o novo telefone: ')
             nova_senha = (input('Digite a nova senha do Paciente:'))
+            novo_telefone = validar_telefone('Digite o novo telefone: ')
             novo_acompanhante = (input('O paciente terá acompanhante? (S/N): '))
             
             update_paciente(id_paciente,novo_nome,novo_email,nova_senha,novo_telefone,novo_acompanhante)

@@ -54,10 +54,10 @@ def read_consulta():
             FROM consultas ORDER BY id_consulta
         """
         cursor.execute(sql)
-        print("\n --- Lista de Pacientes ---")
+        print("\n --- Lista de Consultas ---")
         rows = cursor.fetchall()
         for row in rows:
-            print(f'id: {row[0]}, especialidade: {row[1]}, data_consulta: {row[2]}, status: {row[3]}, id_paciente: {row[4]}')
+            print(f'ID da consulta: {row[0]}, especialidade: {row[1]}, data da consulta: {row[2]}, status: {row[3]} e id do paciente relacionado: {row[4]}')
             print('----------------------------------')
     except oracledb.Error as e:
         print(f'\nErro ao ler Pacientes: {e}')
@@ -152,7 +152,7 @@ def main_consulta():
             id_consulta = validar_inteiro('Digite o ID da Consulta: ')
             especialidade = validar_string('Digite a especialidade da consulta: ')
             data_consulta = validar_data('Digite a data da consulta: ')
-            status= (input('Digite o status (S/N): '))
+            status= (input('Digite o status (A/I): '))
             id_paciente = validar_inteiro('Digite o ID do Paciente: ')
             create_consulta(id_consulta,especialidade,data_consulta,status, id_paciente)
     
@@ -163,7 +163,7 @@ def main_consulta():
             id_consulta = validar_inteiro('Digite o Id da Consulta: ')
             novo_especialidade = validar_string('Digite a nova especialidade da Consulta: ')
             novo_data_consulta = validar_data('Digite a nova data da Consulta: ')
-            novo_status = (input('Digite o novo status (S/N): '))
+            novo_status = (input('Digite o novo status (A/I): '))
             novo_paciente = validar_inteiro('Digite o novo Id do Paciente: ')
             update_consulta(id_consulta,novo_especialidade,novo_data_consulta,novo_status, novo_paciente)
 

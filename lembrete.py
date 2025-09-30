@@ -51,7 +51,7 @@ def read_lembrete():
         print("\n --- Lista de lembretes ---")
         rows = cursor.fetchall()
         for row in rows:
-            print(f'ID: {row[0]}, data_envio: {row[1]}, id_consulta: {row[2]}')
+            print(f'ID do Lembrete: {row[0]}, data e hora registradas: {row[1]}, id da consulta: {row[2]}')
             print('----------------------------------')
     except oracledb.Error as e:
         print(f'\nErro ao ler lembretes: {e}')
@@ -80,7 +80,7 @@ def update_lembrete(id_lembrete, nova_data_envio, novo_id_consulta):
         cursor.execute(sql, {'nova_data_envio' : nova_data_envio, 'novo_id_consulta' :novo_id_consulta, 'id_lembrete': id_lembrete})
         conn.commit()
         if cursor.rowcount >0:
-            print(f' A nova data_envio: {nova_data_envio} e id_consulta: {novo_id_consulta} do lembrete: {id_lembrete} foram atualizados!')
+            print(f' A nova data de envio: {nova_data_envio} e id da consulta: {novo_id_consulta} do lembrete: {id_lembrete} foram atualizados!')
         else:
             print(f' Nenhum lembrete com ID {id_lembrete} foi encontrado')
 

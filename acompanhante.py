@@ -7,7 +7,7 @@ from utilitarios import getConnection,validar_inteiro,validar_string,validar_nom
 email, telefone, parentesco e nome e id_paciente?
 '''
 #Operações CRUD
-def create_acompanhante(id_acompanhante, email, telefone, parentesco, nome):
+def create_acompanhante(id_acompanhante, email, telefone, parentesco, id_paciente, nome):
     print('*** Inserindo um novo acompanhante na tabela acompanhante ***')
     conn = getConnection()
 
@@ -18,18 +18,19 @@ def create_acompanhante(id_acompanhante, email, telefone, parentesco, nome):
     try:
         cursor = conn.cursor() #obter um cursor
         sql = """
-            INSERT INTO acompanhantes (id_acompanhante, email, telefone, parentesco, nome)
-            VALUES (:id_acompanhante, :email, :telefone, :parentesco, :nome)
+            INSERT INTO acompanhantes (id_acompanhante, email, telefone, parentesco, id_paciente, nome)
+            VALUES (:id_acompanhante, :email, :telefone, :parentesco, :id_paciente, :nome)
         """
         cursor.execute(sql, {
             'id_acompanhante' : id_acompanhante,
-            'nome' : nome,
             'email' : email,
             'telefone' : telefone,
-            'parentesco' : parentesco
+            'parentesco' : parentesco,
+            'id_paciente' : id_paciente,
+            'nome' : nome
         })
         conn.commit()
-        print(f' O acompanhante de ID: {id_acompanhante}, nome: {nome} email: {email}, telefone: {telefone} e grau de parentesco: {parentesco} foi adicionado com sucesso!')
+        print(f' O acompanhante de ID: {id_acompanhante}, nome: {nome} email: {email}, telefone: {telefone}, grau de parentesco: {parentesco} do paciente de id{id_paciente}foi adicionado com sucesso!')
     except oracledb.Error as e:
         print(f'\nErro ao inserir acompanhante: {e}')
         conn.rollback()
@@ -47,14 +48,14 @@ def read_acompanhante():
     try:
         cursor = conn.cursor()
         sql = """
-            SELECT id_acompanhante, nome, email , telefone, parentesco,
+            SELECT id_acompanhante, email , telefone, parentesco, id_paciente, nome
             FROM acompanhantes ORDER BY id_acompanhante
         """
         cursor.execute(sql)
         print("\n --- Lista de acompanhantes ---")
         rows = cursor.fetchall()
         for row in rows:
-            print(f'id: {row[0]}, nome: {row[1]}, email: {row[2]}, telefone: {row[3]} e grau de parentesco: {row[4]}')
+            print(f'ID acompanhante: {row[0]}, email: {row[1]}, telefone: {row[2]}, grau de parentesco: {row[3]}, ID do paciente: {row[4]} e nome{[5]}')
             print('----------------------------------')
     except oracledb.Error as e:
         print(f'\nErro ao ler acompanhantes: {e}')
@@ -65,7 +66,7 @@ def read_acompanhante():
 
 #Update
 #Atualizar um dado de um acompanhante
-def update_acompanhante(id_acompanhante, novo_email, novo_telefone, novo_parentesco, novo_nome):
+def update_acompanhante(id_acompanhante, novo_email, novo_telefone, novo_parentesco, novo_id_paciente, novo_nome):
     print(f'Atualizando os dados do acompanhante pelo ID')
 
     conn = getConnection()
@@ -77,13 +78,13 @@ def update_acompanhante(id_acompanhante, novo_email, novo_telefone, novo_parente
         sql = """
 
         UPDATE acompanhantes
-        set nome = :novo_nome, email = :novo_email, telefone = :novo_telefone, parentesco = :novo_parentesco WHERE id_acompanhante = :id_acompanhante
+        set email = :novo_email, telefone = :novo_telefone, parentesco = :novo_parentesco, id_paciente = : novo_id_paciente, nome = :novo_nome,  WHERE id_acompanhante = :id_acompanhante
         
         """
-        cursor.execute(sql, { 'novo_nome' : novo_nome, 'novo_email' : novo_email, 'novo_telefone' : novo_telefone, 'novo_parentesco' :novo_parentesco,'id_acompanhante': id_acompanhante})
+        cursor.execute(sql, {'novo_email' : novo_email, 'novo_telefone' : novo_telefone, 'novo_parentesco' :novo_parentesco, 'novo_id_paciente' : novo_id_paciente,'novo_nome' : novo_nome, 'id_acompanhante': id_acompanhante})
         conn.commit()
         if cursor.rowcount >0:
-            print(f'O novo nome: {novo_nome}, novo email: {novo_email}, telefone: {novo_telefone} e grau parentesco: {novo_parentesco} do acompanhante de ID:{id_acompanhante} foram atualizados!')
+            print(f'O novo email: {novo_email}, telefone: {novo_telefone} e grau parentesco: {novo_parentesco}, relacionado com o paciente ID: {novo_id_paciente} e nome: {novo_nome} do acompanhante de ID:{id_acompanhante} foram atualizados!')
         else:
             print(f'Nenhum acompanhante com ID {id_acompanhante} foi encontrado')
 
@@ -146,22 +147,24 @@ def main_acompanhante():
         opcao=validar_inteiro('Digite uma opção: ')
         if opcao ==1:
             id_acompanhante = validar_inteiro('Digite o ID do acompanhante: ')
-            nome = validar_nome('Digite o nome do acompanhante: ')
             email = validar_email('Digite o email do acompanhante: ')
             telefone = validar_telefone('Digite o telefone do acompanhante: ')
             parentesco = validar_string('Digite o parentesco do acompanhante: ')
-            create_acompanhante(id_acompanhante,nome,email,telefone,parentesco)
+            id_paciente = validar_inteiro('Digite o ID do paciente relacionado')
+            nome = validar_nome('Digite o nome do acompanhante: ')
+            create_acompanhante(id_acompanhante,email,telefone,parentesco,id_paciente,nome)
     
         elif opcao==2:
             read_acompanhante()
 
         elif opcao==3:
             id_acompanhante = validar_inteiro('Digite o Id do acompanhante: ')
+            novo_email = validar_email('Digite o novo email do acompanhante: ')
+            novo_telefone = validar_telefone('Digite o novo telefone do acompanhante: ')
+            novo_parentesco = validar_string('Digite o novo grau de parentesco: ')
+            novo_id_paciente = validar_inteiro('Digite o novo ID do paciente relacionado: ')
             novo_nome = validar_nome('Digite o novo nome do acompanhante: ')
-            novo_email = (input('Digite o novo email do acompanhante: '))
-            novo_telefone = (input('Digite o novo telefone do acompanhante: '))
-            novo_parentesco = (input('Digite o novo grau de parentesco: '))
-            update_acompanhante(id_acompanhante,novo_nome,novo_email,novo_telefone,novo_parentesco,)
+            update_acompanhante(id_acompanhante,novo_email,novo_telefone,novo_parentesco,novo_id_paciente,novo_nome)
 
         elif opcao==4:
             id_acompanhante = validar_inteiro('Digite o Id do acompanhante: ')
