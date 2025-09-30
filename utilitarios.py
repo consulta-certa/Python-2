@@ -28,114 +28,166 @@ def getConnection():
         print(f'Erro ao obter a conexão: {e}')
     return conn
 
-#valida numeros inteiros
+# --- Valida Números Inteiros ---
 def validar_inteiro(entrada: str) -> int:
+    """
+    Solicita um valor e garante que é um número inteiro, repetindo até ser válido.
+    """
     while True:
         try:
+            # Solicita a entrada dentro do loop
             valor = int(input(entrada))
             return valor
         except ValueError:
             print(f"Entrada inválida. Por favor, digite um número inteiro.")
- 
-# Importante: O oracledb espera o objeto datetime do Python
 
-def validar_data(entrada: str): # Removi a dica de tipo -> bool, pois o retorno pode ser datetime ou False
-    try:
-        # 1. Tenta converter a string para um objeto datetime
-        data = datetime.strptime(entrada, "%d/%m/%Y %H:%M") 
-        
-        # 2. Verifica se a data não está no passado (usando a data/hora atual)
-        if data < datetime.now(): 
-            print("Operação cancelada. Inserir apenas uma data válida a partir de hoje.")
-            return False # Se for inválida (passado), retorna False
+
+# --- Valida Data e Hora (a partir de hoje) ---
+def validar_data(mensagem: str) -> datetime:
+    """
+    Solicita uma data/hora no formato 'DD/MM/AAAA HH:MM' e valida se é futura ou atual.
+    Repete até receber uma data/hora válida.
+    """
+    formato = "%d/%m/%Y %H:%M"
+    while True:
+        entrada = input(mensagem) # Solicita a entrada dentro do loop
+        try:
+            data = datetime.strptime(entrada, formato)
             
-        # 3. Se tudo estiver OK (válida e futura), RETORNA O OBJETO DATETIME
-        return data 
-        
-    except ValueError:
-        # 4. Se o formato da string estiver errado
-        print("Operação cancelada. Inserir apenas no formato exato 'DD/MM/AAAA HH:MM'.")
-        return False
+            # Compara a data inserida (sem segundos/microssegundos) com a data/hora atual
+            # para evitar problemas de comparação de milissegundos.
+            if data < datetime.now().replace(microsecond=0):
+                print("Operação cancelada. Inserir apenas uma data/hora válida a partir de agora.")
+            else:
+                return data 
+            
+        except ValueError:
+            print(f"Operação cancelada. Inserir apenas no formato exato '{formato}'.")
 
 
-import re
-
-
+# --- Valida Nome ---
 def validar_nome(mensagem: str) -> str:
     """
     Solicita o nome do usuário, valida se contém apenas letras/espaços.
-    Retorna o nome limpo (sem espaços extras) ou uma string vazia se for inválido.
+    Repete até ser válido.
     """
     while True:
         entrada = input(mensagem)
-
-        # 1. Limpeza: Remove espaços no início e fim
         nome_tratado = entrada.strip()
 
-        padrao = r'^[A-Za-zÀ-ÖØ-öø-ÿ\s]+$'
+        # Padrão para letras, incluindo acentos e espaços (ajustado para melhor cobertura Unicode)
+        padrao = r'^[A-Za-zÀ-ÖØ-öø-ÿ\s]+$' 
 
         if nome_tratado and re.fullmatch(padrao, nome_tratado):
-            # 2. Retorna o nome limpo e validado
             return nome_tratado
         else:
             print("Operação cancelada. Inserir apenas letras válidas.")
-            # O usuário deve tentar novamente no loop 'while True'
 
-#valida email
+
+# --- Valida E-mail ---
 def validar_email(mensagem: str) -> str:
     """
-    Solicita e valida um e-mail do usuário, limpando-o e forçando minúsculas.
-    Retorna o e-mail limpo ou uma string vazia/None se for inválido/cancelado.
+    Solicita e valida um e-mail do usuário. Repete até ser válido.
+    Retorna o e-mail limpo e em minúsculas.
     """
+    # Padrão mais robusto, requer a biblioteca 'regex' para \p{L}
+    # Se usar apenas 're', use: r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
     padrao = r'^[\p{L}0-9._%+-]+@[\p{L}0-9.-]+\.[\p{L}]{2,}$'
-
-    # 1. Solicita a entrada usando a mensagem (Se ela não estiver usando input)
-    entrada = input(mensagem)
-
-    # 2. LIMPEZA DOS DADOS: Remove espaços e força minúsculas
-    email_tratado = entrada.strip().lower()
-
-    if regex.fullmatch(padrao, email_tratado, flags=regex.UNICODE | regex.IGNORECASE):
-        # 3. Retorna o e-mail TRATADO (limpo e em minúsculas)
-        return email_tratado
-    else:
-        print("Operação cancelada. Digite um e-mail válido (ex: nome@dominio.com).")
-        # Retorna uma string vazia ou levanta uma exceção para indicar falha
-        return ""  # Melhor do que retornar um booleano aqui
-
-#valida cep
-def validar_cep(entrada: str) -> bool:
-    padrao = r'^\d{5}-?\d{3}$'  # Aceita "12345678" ou "12345-678"
-    
-    if entrada and regex.fullmatch(padrao, entrada):
-        return True
-    else:
-        print("Operação cancelada. Inserir um CEP válido (ex: 12345678 ou 12345-678).")
-        return False
-
-
-def validar_telefone(mensagem: str) -> str:
-    """
-    Solicita e valida um número de telefone no formato brasileiro.
-    Retorna o telefone como string ou uma string vazia se inválido.
-    """
-    padrao = r'^(\(?\d{2}\)?[\s-]?)?(9\d{4}[\s-]?\d{4})$'
 
     while True:
         entrada = input(mensagem)
+        email_tratado = entrada.strip().lower()
 
-        # Limpa espaços e formatação para validação e armazenamento
+        # Usa regex.fullmatch, que é mais robusto para UNICODE. 
+        # Se usar 're', remova o 'flags' ou use re.IGNORECASE.
+        if regex.fullmatch(padrao, email_tratado, flags=regex.UNICODE | regex.IGNORECASE):
+            return email_tratado
+        else:
+            print("Operação cancelada. Digite um e-mail válido (ex: nome@dominio.com).")
+
+
+# --- Valida CEP ---
+def validar_cep(mensagem: str) -> str:
+    """
+    Solicita e valida um CEP no formato 8 dígitos opcionalmente com hífen. Repete até ser válido.
+    Retorna o CEP como string (sem higienização automática).
+    """
+    padrao = r'^\d{5}-?\d{3}$'
+    
+    while True:
+        entrada = input(mensagem)
+        # O código original usava 'regex.fullmatch', mantendo a compatibilidade com 'regex'
+        if entrada and regex.fullmatch(padrao, entrada):
+            return entrada
+        else:
+            print("Operação cancelada. Inserir um CEP válido (ex: 12345678 ou 12345-678).")
+
+
+# --- Valida Telefone (11 dígitos, formato brasileiro) ---
+def validar_telefone(mensagem: str) -> str:
+    """
+    Solicita e valida um número de telefone no formato brasileiro (11 dígitos).
+    Retorna o telefone apenas com dígitos. Repete até ser válido.
+    """
+    # Padrão que aceita formatos comuns, mas a validação final será por comprimento
+    # (Ex: (11) 98765-4321 ou 11987654321)
+    
+    while True:
+        entrada = input(mensagem)
+
+        # Remove todos os caracteres não numéricos: espaços, parênteses e hífens
         telefone_limpo = re.sub(r'[\s\(\)-]', '', entrada)
-
-        # Usando o padrão modificado para verificar se o telefone limpo é válido
-        # Se você quer validar o formato com os caracteres:
-        # padrao = r'^(\(?\d{2}\)?[\s-]?)?(9\d{4}[\s-]?\d{4})$'
-        # if regex.fullmatch(padrao, entrada):
-
-        # Se preferir validar o número puro (11 dígitos):
+        
+        # Valida se tem exatamente 11 dígitos e são todos numéricos
         if len(telefone_limpo) == 11 and telefone_limpo.isdigit():
-            return telefone_limpo  # Retorna o número puro (só dígitos)
+            return telefone_limpo
         else:
             print("Operação cancelada. Inserir um telefone válido (ex: 11987654321 ou (11) 98765-4321).")
-            # Se fosse para sair do loop em vez de tentar novamente:
-            # return ""
+            
+def validar_booleano(mensagem: str) -> bool:
+    """
+    Solicita uma entrada e força uma resposta booleana (True ou False).
+    Aceita 's', 'n', 'sim', 'nao', 'true', 'false' (case-insensitive).
+    Repete a solicitação até receber uma entrada válida.
+    """
+    while True:
+        entrada = input(mensagem).strip().lower() # Limpa e converte para minúsculas
+
+        # Define as respostas que significam True
+        if entrada in ('s', 'sim', 'true', '1', 'ok', 'S', 'SIM'):
+            return True
+        
+        # Define as respostas que significam False
+        elif entrada in ('n', 'não', 'nao', 'false', '0', 'cancelar', 'NAO', 'NÃO'):
+            return False
+            
+        # Se não for uma resposta válida, informa o erro e o loop repete
+        else:
+            print("Entrada inválida. Por favor, digite 'sim' ou 'não' (ou variações como 's'/'n').")
+
+def validar_string(mensagem: str, minimo: int = 1, maximo: int = 100) -> str:
+    """
+    Solicita uma string ao usuário e garante que ela não está vazia e está dentro
+    de um comprimento mínimo e máximo. Repete até ser válida.
+    """
+    while True:
+        entrada = input(mensagem)
+        # 1. Remove espaços em branco do início e fim
+        string_tratada = entrada.strip()
+        
+        tamanho = len(string_tratada)
+
+        # 2. Verifica se está vazia ou contém apenas espaços
+        if not string_tratada:
+            print("Entrada inválida. O campo não pode ficar vazio.")
+            continue # Volta para o início do loop
+
+        # 3. Verifica o comprimento
+        if tamanho < minimo:
+            print(f"Entrada inválida. O valor deve ter pelo menos {minimo} caracteres.")
+        elif tamanho > maximo:
+            print(f"Entrada inválida. O valor deve ter no máximo {maximo} caracteres.")
+        
+        # 4. Se passar por todas as verificações, retorna
+        else:
+            return string_tratada

@@ -1,9 +1,10 @@
 import oracledb
-from utilitarios import getConnection
+from utilitarios import getConnection,validar_inteiro,validar_string,validar_nome,validar_email,validar_telefone
+
 
 '''
 1.2. Cada ACOMPANHANTE deve ser representado com as chaves: id_acompanhante,
-email, telefone, parentesco e nome.
+email, telefone, parentesco e nome e id_paciente?
 '''
 #Operações CRUD
 def create_acompanhante(id_acompanhante, email, telefone, parentesco, nome):
@@ -142,32 +143,34 @@ def main_acompanhante():
         print('4. Excluir um acompanhante')
         print('5. Encerrar o Programa')
 
-        opcao=int(input('Digite uma opção: '))
+        opcao=validar_inteiro('Digite uma opção: ')
         if opcao ==1:
-            id_acompanhante = int(input('ID: '))
-            nome=(input('nome: '))
-            email = (input('email: '))
-            telefone = (input('telefone: '))
-            parentesco= (input('parentesco: '))
+            id_acompanhante = validar_inteiro('Digite o ID do acompanhante: ')
+            nome = validar_nome('Digite o nome do acompanhante: ')
+            email = validar_email('Digite o email do acompanhante: ')
+            telefone = validar_telefone('Digite o telefone do acompanhante: ')
+            parentesco = validar_string('Digite o parentesco do acompanhante: ')
             create_acompanhante(id_acompanhante,nome,email,telefone,parentesco)
     
         elif opcao==2:
             read_acompanhante()
 
         elif opcao==3:
-            id_acompanhante = int(input('Digite o Id do acompanhante: '))
-            novo_nome = int(input('Digite o novo nome do acompanhante: '))
+            id_acompanhante = validar_inteiro('Digite o Id do acompanhante: ')
+            novo_nome = validar_nome('Digite o novo nome do acompanhante: ')
             novo_email = (input('Digite o novo email do acompanhante: '))
             novo_telefone = (input('Digite o novo telefone do acompanhante: '))
             novo_parentesco = (input('Digite o novo grau de parentesco: '))
             update_acompanhante(id_acompanhante,novo_nome,novo_email,novo_telefone,novo_parentesco,)
 
         elif opcao==4:
-            id_acompanhante = int(input('Digite o Id do acompanhante: '))
+            id_acompanhante = validar_inteiro('Digite o Id do acompanhante: ')
             delete_acompanhante(id_acompanhante)
     
         elif opcao == 5:
             print('Encerrando o programa... volte sempre')
             break
-
+        else:
+            print("❌ Opção inválida. Tente novamente com um número inteiro entre 0 e 5.")
+            
 main_acompanhante

@@ -1,5 +1,5 @@
 import oracledb
-from utilitarios import getConnection
+from utilitarios import getConnection,validar_inteiro,validar_string,validar_nome,validar_email,validar_telefone,validar_cep
 
 '''
 1.5. CONTATO deve ser representado com as chaves: id_contato, nome, telefone,
@@ -146,40 +146,42 @@ def main_contato():
         print('4. Excluir um contato')
         print('5. Encerrar o Programa')
 
-        opcao=int(input('Digite uma opção: '))
+        opcao=validar_inteiro('Digite uma opção: ')
         if opcao ==1:
-            id_contato = int(input('ID: '))
-            nome = (input('nome: '))
-            telefone = (input('telefone: '))
-            email= (input('email: '))
-            numero=(input('numero: '))
-            rua=(input('rua: '))
-            bairro=(input('bairro: ')) 
-            cidade=(input('cidade: '))
-            cep=(input('cep: '))
+            id_contato = validar_inteiro('Digite o ID do contato: ')
+            nome = validar_nome('Digite o nome do contato: ')
+            telefone = validar_telefone('Digite o o telefone do contato: ')
+            email= validar_email('Digite o email do contato: ')
+            numero=validar_inteiro('Digite o numero da residência do contato: ')
+            rua=validar_string('Digite a rua do contato: ')
+            bairro=validar_string('Digite o bairro do contato: ') 
+            cidade=validar_string('Digite a cidade do contato: ')
+            cep=validar_cep('Digite o cep do contato: ')
             create_contato(id_contato,nome,telefone,email,numero,rua,bairro,cidade,cep)
     
         elif opcao==2:
             read_contato()
 
         elif opcao==3:
-            id_contato = int(input('Digite o Id do contato: '))
-            novo_nome = (input('Digite o novo nome do contato: '))
-            novo_telefone = (input('Digite o novo telefone do contato: '))
-            novo_email = (input('Digite o novo email do contato: '))
-            novo_numero = int(input('Digite o novo numero do contato: '))
-            nova_rua = (input('Digite a nova rua do contato: '))
-            novo_bairro = (input('Digite o novo bairro do contato: ')) 
-            nova_cidade = (input('Digite a nova cidade do contato: '))
-            novo_cep = (input('Digite o novo cep do contato: '))  
+            id_contato = validar_inteiro('Digite o Id do contato: ')
+            novo_nome = validar_nome('Digite o novo nome do contato: ')
+            novo_telefone = validar_telefone('Digite o novo telefone do contato: ')
+            novo_email = validar_email('Digite o novo email do contato: ')
+            novo_numero = validar_inteiro('Digite o novo numero do contato: ')
+            nova_rua = validar_string('Digite a nova rua do contato: ')
+            novo_bairro = validar_string('Digite o novo bairro do contato: ')
+            nova_cidade = validar_string('Digite a nova cidade do contato: ')
+            novo_cep = validar_cep('Digite o novo cep do contato: ')
             update_contato(id_contato,novo_nome,novo_telefone,novo_email,novo_numero,nova_rua,novo_bairro,nova_cidade,novo_cep)
 
         elif opcao==4:
-            id_contato = int(input('Digite o Id do contato: '))
+            id_contato = validar_inteiro('Digite o Id do contato: ')
             delete_contato(id_contato)
     
         elif opcao == 5:
             print('Encerrando o programa... volte sempre')
             break
+        else:
+            print("❌ Opção inválida. Tente novamente com um número inteiro entre 0 e 5.")
 
 main_contato

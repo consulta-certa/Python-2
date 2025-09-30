@@ -1,5 +1,5 @@
 import oracledb
-from utilitarios import getConnection
+from utilitarios import getConnection,validar_inteiro,validar_string,validar_data
 
 '''
 1.8. CONTEUDO deve ser representado com as chaves: id_conteudo, tipo, titulo, texto, video,
@@ -138,45 +138,46 @@ def main_conteudo():
 
     while True:
 
-        print('**Menu - conteudo**')
-        print('1. Inserir um novo conteudo')
-        print('2. Listar todos os conteudos')
-        print('3. Atualizar os dados de um conteudo')
-        print('4. Excluir um conteudo')
+        print('**Menu - conteúdo**')
+        print('1. Inserir um novo conteúdo')
+        print('2. Listar todos os conteúdos')
+        print('3. Atualizar os dados de um conteúdo')
+        print('4. Excluir um conteúdo')
         print('5. Encerrar o Programa')
 
-        opcao=int(input('Digite uma opção: '))
+        opcao=validar_inteiro('Digite uma opção: ')
         if opcao ==1:
-            id_conteudo = int(input('ID: '))
-            tipo = (input('tipo: '))
-            titulo = (input('titulo: '))
-            texto= (input('texto: '))
-            video=(input('URL do video: '))
-            imagem=(input('URL da imagem: '))
-            data_publicacao=(input(': '))  
-            ''' FAZER A VALIDAÇAO DE DATA'''
+            id_conteudo = validar_inteiro('Digite o ID do conteúdo: ')
+            tipo = validar_string('Digite o tipo do conteúdo: ')
+            titulo = validar_string('Digite o titulo do conteúdo: ')
+            texto= validar_string('Digite o texto: ')
+            video = validar_string('Digite a URL do video: ')
+            imagem = validar_string('URL da imagem: ')
+            data_publicacao = validar_data('Digite a data de publicação do conteúdo: ')
+            
             create_conteudo(id_conteudo,tipo,titulo,texto,video,imagem,data_publicacao)
     
         elif opcao==2:
             read_conteudo()
 
         elif opcao==3:
-            id_conteudo = int(input('Digite o Id do conteudo: '))
-            novo_tipo = (input('Digite o novo tipo do conteudo: '))
-            novo_titulo = (input('Digite o novo titulo do conteudo: '))
-            novo_texto = (input('Digite o novo texto: '))
-            novo_video = (input('Digite a nova URL do video: '))
-            nova_imagem = (input('Digite a nova Url texto: '))
-            nova_publicacao = (input('texto: ')) 
-            ''' fazer a validaçao de data'''
+            id_conteudo = validar_inteiro('Digite o Id do conteúdo: ')
+            novo_tipo = validar_string('Digite o novo tipo do conteúdo: ')
+            novo_titulo = validar_string('Digite o novo titulo do conteúdo: ')
+            novo_texto = validar_string('Digite o novo texto: ')
+            novo_video = validar_string('Digite a nova URL do video: ')
+            nova_imagem = validar_string('Digite a nova Url da imagem: ')
+            nova_publicacao = validar_data('Digite a nova data de publicação do conteúdo: ')
             update_conteudo(id_conteudo,novo_tipo,novo_titulo,novo_texto,novo_video,nova_imagem,nova_publicacao)
 
         elif opcao==4:
-            id_conteudo = int(input('Digite o Id do conteudo: '))
+            id_conteudo = validar_inteiro('Digite o Id do conteudo: ')
             delete_conteudo(id_conteudo)
     
         elif opcao == 5:
             print('Encerrando o programa... volte sempre')
             break
+        else:
+            print("❌ Opção inválida. Tente novamente com um número inteiro entre 0 e 5.")        
 
 main_conteudo

@@ -1,5 +1,5 @@
 import oracledb
-from utilitarios import getConnection
+from utilitarios import getConnection,validar_string,validar_inteiro
 
 '''
 1.7. CONVERSA_CHATBOT deve ser representado com as chaves: id_conversa, pergunta e aprovacao.
@@ -139,28 +139,30 @@ def main_conversa_chatbot():
         print('4. Excluir uma conversa com chatbot')
         print('5. Encerrar o Programa')
 
-        opcao=int(input('Digite uma opção: '))
+        opcao=validar_inteiro('Digite uma opção: ')
         if opcao ==1:
-            id_conversa = int(input('ID: '))
-            pergunta = (input('pergunta: '))
-            aprovacao = (input('aprovacao: '))
+            id_conversa =validar_inteiro('Digite o ID da conversa: ')
+            pergunta = validar_string('Digite a pergunta: ')
+            aprovacao = (input('Digite a aprovação (S/N): '))
             create_conversa_chatbot(id_conversa,pergunta,aprovacao)
     
         elif opcao==2:
             read_conversa_chatbot()
 
         elif opcao==3:
-            id_conversa = int(input('Digite o Id da conversa com chatbot: '))
-            nova_pergunta = (input('Digite a nova pergunta da conversa com chatbot: '))
-            nova_aprovaçao = (input('Digite o nova aprovação da conversa com chatbot: '))
+            id_conversa = validar_inteiro('Digite o Id da conversa com chatbot: ')
+            nova_pergunta = validar_string('Digite a nova pergunta da conversa com chatbot: ')
+            nova_aprovaçao = (input('Digite o nova aprovação da conversa com chatbot (S/N): '))
             update_conversa_chatbot(id_conversa,nova_pergunta,nova_aprovaçao)
 
         elif opcao==4:
-            id_conversa = int(input('Digite o Id da conversa com chatbot: '))
+            id_conversa = validar_inteiro('Digite o Id da conversa com chatbot: ')
             delete_conversa_chatbot(id_conversa)
     
         elif opcao == 5:
             print('Encerrando o programa... volte sempre')
             break
+        else:
+            print("❌ Opção inválida. Tente novamente com um número inteiro entre 0 e 5.")
 
 main_conversa_chatbot

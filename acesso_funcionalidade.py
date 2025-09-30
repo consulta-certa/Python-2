@@ -1,5 +1,5 @@
 import oracledb
-from utilitarios import getConnection
+from utilitarios import getConnection, validar_inteiro,validar_string
 
 '''
 1.9. ACESSO_FUNCIONALIDADE deve ser representado com as chaves: id_acesso, funcionalidade,
@@ -142,30 +142,32 @@ def main_acesso():
         print('4. Excluir um acesso')
         print('5. Encerrar o Programa')
 
-        opcao=int(input('Digite uma opção: '))
+        opcao=validar_inteiro('Digite uma opção: ')
         if opcao ==1:
-            id_acesso = int(input('ID: '))
-            funcionalidade = (input('Funcionalidade: '))
-            quantidade_acessos = (input('Quantidade de acessos: '))
-            tempo_permanencia_seg= (input('Tempo de permanencia em segundos: '))
+            id_acesso = validar_inteiro('Digite o ID do acesso: ')
+            funcionalidade = validar_string('Digite a Funcionalidade do acesso: ')
+            quantidade_acessos = validar_string('Digite a quantidade de acessos: ')
+            tempo_permanencia_seg= validar_string('Digite o tempo de permanencia em segundos: ')
             create_acesso(id_acesso,funcionalidade,quantidade_acessos,tempo_permanencia_seg)
     
         elif opcao==2:
             read_acesso()
 
         elif opcao==3:
-            id_acesso = int(input('Digite o Id do acesso: '))
-            nova_funcionalidade = (input('Digite a nova funcionalidade do acesso: '))
-            nova_quantidade_acessos = (input('Digite a nova quantidade de acessos do acesso: '))
-            novo_tempo_permanencia_seg = (input('Digite o novo tempo de permanencia em segundos: '))
+            id_acesso = validar_inteiro('Digite o Id do acesso: ')
+            nova_funcionalidade = validar_string('Digite a nova funcionalidade do acesso: ')
+            nova_quantidade_acessos = validar_string('Digite a nova quantidade de acessos do acesso: ')
+            novo_tempo_permanencia_seg = validar_string('Digite o novo tempo de permanencia em segundos: ')
             update_acesso(id_acesso,nova_funcionalidade,nova_quantidade_acessos,novo_tempo_permanencia_seg)
 
         elif opcao==4:
-            id_acesso = int(input('Digite o Id do acesso: '))
+            id_acesso = validar_inteiro('Digite o Id do acesso: ')
             delete_acesso(id_acesso)
     
         elif opcao == 5:
             print('Encerrando o programa... volte sempre')
             break
+        else:
+            print("❌ Opção inválida. Tente novamente com um número inteiro entre 0 e 5.")
 
 main_acesso

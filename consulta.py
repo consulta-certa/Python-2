@@ -1,12 +1,13 @@
+import oracledb
+from utilitarios import getConnection,validar_string,validar_inteiro,validar_data
+
+
 '''
 
 1.3. CONSULTAS devem ser representadas com as chaves: id_consulta, especialidade,
 data_consulta Localdatetime, status e id_paciente.
 
 '''
-
-import oracledb
-from utilitarios import getConnection
 
 #Operações CRUD
 def create_consulta(id_consulta, especialidade, data_consulta, status, id_paciente):
@@ -146,32 +147,34 @@ def main_consulta():
         print('4. Excluir uma Consulta')
         print('5. Encerrar o Programa')
 
-        opcao=int(input('Digite uma opção: '))
+        opcao=validar_inteiro('Digite uma opção: ')
         if opcao ==1:
-            id_consulta = int(input('ID da Consulta: '))
-            especialidade = (input('especialidade: '))
-            data_consulta = (input('data da consulta: '))
-            status= (input('status: '))
-            id_paciente = int(input('ID do Paciente: '))
+            id_consulta = validar_inteiro('Digite o ID da Consulta: ')
+            especialidade = validar_string('Digite a especialidade da consulta: ')
+            data_consulta = validar_data('Digite a data da consulta: ')
+            status= (input('Digite o status (S/N): '))
+            id_paciente = validar_inteiro('Digite o ID do Paciente: ')
             create_consulta(id_consulta,especialidade,data_consulta,status, id_paciente)
     
         elif opcao==2:
             read_consulta()
 
         elif opcao==3:
-            id_consulta = int(input('Digite o Id da Consulta: '))
-            novo_especialidade = (input('Digite a nova especialidade da Consulta: '))
-            novo_data_consulta = (input('Digite a nova data da Consulta: '))
-            novo_status = (input('Digite o novo status: '))
-            novo_paciente = int(input('Digite o novo Id do Paciente: '))
+            id_consulta = validar_inteiro('Digite o Id da Consulta: ')
+            novo_especialidade = validar_string('Digite a nova especialidade da Consulta: ')
+            novo_data_consulta = validar_data('Digite a nova data da Consulta: ')
+            novo_status = (input('Digite o novo status (S/N): '))
+            novo_paciente = validar_inteiro('Digite o novo Id do Paciente: ')
             update_consulta(id_consulta,novo_especialidade,novo_data_consulta,novo_status, novo_paciente)
 
         elif opcao==4:
-            id_consulta = int(input('Digite o Id da Consulta: '))
+            id_consulta = validar_inteiro('Digite o Id da Consulta: ')
             delete_consulta(id_consulta)
     
         elif opcao == 5:
             print('Encerrando o programa... volte sempre')
             break
+        else:
+            print("❌ Opção inválida. Tente novamente com um número inteiro entre 0 e 5.")
 
 main_consulta

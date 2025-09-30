@@ -1,5 +1,5 @@
 import oracledb
-from utilitarios import getConnection
+from utilitarios import getConnection,validar_string,validar_inteiro,validar_data
 
 '''
 1.6. AVALIACAO deve ser representado por um dicionário com as chaves: id_avaliacao, nota, comentario,
@@ -142,34 +142,34 @@ def main_avaliacao():
         print('4. Excluir uma avaliação')
         print('5. Encerrar o Programa')
 
-        opcao=int(input('Digite uma opção: '))
+        opcao=validar_inteiro('Digite uma opção: ')
         if opcao ==1:
-            id_avaliacao = int(input('ID: '))
-            nota = (input('nota: '))
-            comentario = (input('comentario: '))
-            data_avaliacao= (input('data da avaliacao: '))
-            ''' fazer validaçao de data'''
-            id_lembrete=(input('id do lembrete: '))
+            id_avaliacao = validar_inteiro('ID: ')
+            nota = validar_inteiro('nota: ')
+            comentario = validar_string('comentario: ')
+            data_avaliacao= validar_data('data da avaliacao: ')
+            id_lembrete=validar_inteiro('id do lembrete: ')
             create_avaliacao(id_avaliacao,nota,comentario,data_avaliacao,id_lembrete)
     
         elif opcao==2:
             read_avaliacao()
 
         elif opcao==3:
-            id_avaliacao = int(input('Digite o Id da avaliação: '))
-            nova_nota = (input('Digite a nova nota da avaliação: '))
-            novo_comentario = (input('Digite o novo comentario da avaliação: '))
-            nova_data_avaliacao = (input('Digite a nova data da avaliação: ')) 
-            '''fazer validaçao da data'''
-            novo_id_lembrete = int(input('Digite o novo id do lembrete: '))
+            id_avaliacao = validar_inteiro('Digite o Id da avaliação: ')
+            nova_nota = validar_inteiro('Digite a nova nota da avaliação: ')
+            novo_comentario = validar_string('Digite o novo comentario da avaliação: ')
+            nova_data_avaliacao = validar_data('Digite a nova data da avaliação: ')
+            novo_id_lembrete = validar_inteiro('Digite o novo id do lembrete: ')
             update_avaliacao(id_avaliacao,nova_nota,novo_comentario,nova_data_avaliacao,novo_id_lembrete)
 
         elif opcao==4:
-            id_avaliacao = int(input('Digite o Id da avaliação: '))
+            id_avaliacao = validar_inteiro('Digite o Id da avaliação: ')
             delete_avaliacao(id_avaliacao)
     
         elif opcao == 5:
             print('Encerrando o programa... volte sempre')
             break
-
+        else:
+            print("❌ Opção inválida. Tente novamente com um número inteiro entre 0 e 5.")
+            
 main_avaliacao

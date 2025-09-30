@@ -1,12 +1,12 @@
 import oracledb
-from utilitarios import getConnection,validar_nome,validar_inteiro,validar_data
+from utilitarios import getConnection,validar_string,validar_inteiro,validar_data
 
 '''
-1.4. lembretes devem ser representados com as chaves: id_lembrete, canal_envio,
+1.4. lembretes devem ser representados com as chaves: id_lembrete,
 data_envio e id_consulta // Tem que ter mensagem e id_paciente para verificação?'''
 
 #Operações CRUD
-def create_lembrete(id_lembrete, canal_envio, data_envio, id_consulta):
+def create_lembrete(id_lembrete, data_envio, id_consulta):
     print('*** Inserindo um novo lembrete na tabela lembretes ***')
     conn = getConnection()
 
@@ -17,17 +17,16 @@ def create_lembrete(id_lembrete, canal_envio, data_envio, id_consulta):
     try:
         cursor = conn.cursor() #obter um cursor
         sql = """
-            INSERT INTO lembretes (id_lembrete, canal_envio, data_envio, id_consulta)
-            VALUES (:id_lembrete, :canal_envio, :data_envio, :id_consulta)
+            INSERT INTO lembretes (id_lembrete, data_envio, id_consulta)
+            VALUES (:id_lembrete, :data_envio, :id_consulta)
         """
         cursor.execute(sql, {
             'id_lembrete' : id_lembrete,
-            'canal_envio' : canal_envio,
             'data_envio' : data_envio,
             'id_consulta' : id_consulta
         })
         conn.commit()
-        print(f' O Lembrete {id_lembrete} de canal envio: {canal_envio} foi adicionado com sucesso!')
+        print(f' O Lembrete {id_lembrete} da consulta: {id_consulta} foi adicionado com sucesso!')
     except oracledb.Error as e:
         print(f'\nErro ao inserior lembrete: {e}')
         conn.rollback()
@@ -45,14 +44,14 @@ def read_lembrete():
     try:
         cursor = conn.cursor()
         sql = """
-            SELECT id_lembrete, canal_envio , data_envio, id_consulta
+            SELECT id_lembrete, data_envio, id_consulta
             FROM lembretes ORDER BY id_lembrete
         """
         cursor.execute(sql)
         print("\n --- Lista de lembretes ---")
         rows = cursor.fetchall()
         for row in rows:
-            print(f'ID: {row[0]}, canal_envio: {row[1]}, data_envio: {row[2]}, id_consulta: {row[3]}')
+            print(f'ID: {row[0]}, data_envio: {row[1]}, id_consulta: {row[2]}')
             print('----------------------------------')
     except oracledb.Error as e:
         print(f'\nErro ao ler lembretes: {e}')
@@ -63,7 +62,7 @@ def read_lembrete():
 
 #Update
 #Atualizar um dado de um lembrete
-def update_lembrete(id_lembrete, novo_canal_envio, novo_data_envio, novo_id_consulta):
+def update_lembrete(id_lembrete, nova_data_envio, novo_id_consulta):
     print(f'Atualizando os dados do lembrete pelo ID')
 
     conn = getConnection()
@@ -75,15 +74,15 @@ def update_lembrete(id_lembrete, novo_canal_envio, novo_data_envio, novo_id_cons
         sql = """
 
         UPDATE lembretes
-        set canal_envio = :novo_canal_envio, data_envio = :novo_data_envio, id_consulta = :novo_id_consulta WHERE id_lembrete = :id_lembrete
+        set data_envio = :nova_data_envio, id_consulta = :novo_id_consulta WHERE id_lembrete = :id_lembrete
         
         """
-        cursor.execute(sql, {'novo_canal_envio' : novo_canal_envio, 'novo_data_envio' : novo_data_envio, 'novo_id_consulta' :novo_id_consulta, 'id_lembrete': id_lembrete})
+        cursor.execute(sql, {'nova_data_envio' : nova_data_envio, 'novo_id_consulta' :novo_id_consulta, 'id_lembrete': id_lembrete})
         conn.commit()
         if cursor.rowcount >0:
-            print(f' O novo canal de envio: {novo_canal_envio}, data_envio: {novo_data_envio} e id_consulta: {novo_id_consulta} do lembrete: {id_lembrete} foram atualizados!')
+            print(f' A nova data_envio: {nova_data_envio} e id_consulta: {novo_id_consulta} do lembrete: {id_lembrete} foram atualizados!')
         else:
-            print(f'Nenhum lembrete com ID {id_lembrete} foi encontrado')
+            print(f' Nenhum lembrete com ID {id_lembrete} foi encontrado')
 
 
     except oracledb.Error as e:
@@ -144,31 +143,20 @@ def main_lembrete():
         opcao=validar_inteiro('Digite uma opção entre 1 a 5: ')
         if opcao == 1:
             id_lembrete = validar_inteiro('Digite o ID do lembrete: ')
-            canal_envio = validar_nome('Digite o canal de envio: ')
+            data_envio = validar_data('Digite a data e hora de envio (DD/MM/AAAA HH:MM): ')
             id_consulta = validar_inteiro('Digite o ID da consulta: ')
-            
-            while True:
-                data_envio = validar_data('Digite a data e hora de envio (DD/MM/AAAA HH:MM): ')
-                if data_envio is not False: 
-                    break
-            create_lembrete(id_lembrete, canal_envio, data_envio, id_consulta)
+
+            create_lembrete(id_lembrete, data_envio, id_consulta)
     
         elif opcao==2:
             read_lembrete()
-
-        # NOVO CÓDIGO para a Opção 3:
+            
         elif opcao == 3:
             id_lembrete = validar_inteiro('Digite o Id do lembrete: ')
-            novo_canal_envio = validar_nome('Digite o novo canal de envio do lembrete: ')
+            nova_data_envio = validar_data('Digite a nova data e hora de envio (DD/MM/AAAA HH:MM): ')
             novo_id_consulta = validar_inteiro('Digite o novo id da consulta: ')
-            
-            # Inclusão do loop de validação para a data de atualização
-            while True:
-                novo_data_envio = validar_data('Digite a nova data e hora de envio (DD/MM/AAAA HH:MM): ')
-                if novo_data_envio is not False: 
-                    break
-                    
-            update_lembrete(id_lembrete, novo_canal_envio, novo_data_envio, novo_id_consulta)
+
+            update_lembrete(id_lembrete, nova_data_envio, novo_id_consulta)
 
         elif opcao==4:
             id_lembrete = validar_inteiro('Digite o Id do lembrete: ')

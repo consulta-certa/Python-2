@@ -2,10 +2,10 @@ import oracledb
 from utilitarios import getConnection,validar_nome,validar_inteiro,validar_email,validar_telefone
 
 '''
-1.1 Cada PACIENTE deve ser representado com as chaves: id_paciente, nome, email, telefone e senha.
+1.1 Cada PACIENTE deve ser representado com as chaves: id_paciente, nome, email, senha, telefone e acompanhante.
 '''
 #Operações CRUD
-def create_paciente(id_paciente, nome, email, telefone, senha):
+def create_paciente(id_paciente, nome, email, senha, telefone, acompanhante):
     print('*** Inserindo um novo paciente na tabela pacientes ***')
     conn = getConnection()
 
@@ -16,15 +16,17 @@ def create_paciente(id_paciente, nome, email, telefone, senha):
     try:
         cursor = conn.cursor() #obter um cursor
         sql = """
-            INSERT INTO pacientes (id_paciente, nome, email, telefone, senha)
-            VALUES (:id_paciente, :nome, :email, :telefone, :senha)
+            INSERT INTO pacientes (id_paciente, nome, email, senha, telefone, acompanhante)
+            VALUES (:id_paciente, :nome, :email, :senha, :telefone, :acompanhante)
         """
         cursor.execute(sql, {
             'id_paciente' : id_paciente,
             'nome' : nome,
             'email' : email,
+            'senha' : senha,
             'telefone' : telefone,
-            'senha' : senha
+            'acompanhante' : acompanhante
+    
         })
         conn.commit()
         print(f'Paciente {id_paciente} de nome {nome} foi adicionado com sucesso!')
@@ -45,14 +47,14 @@ def read_paciente():
     try:
         cursor = conn.cursor()
         sql = """
-            SELECT id_paciente, nome , email, telefone, senha
+            SELECT id_paciente, nome , email, senha, telefone, acompanhante
             FROM pacientes ORDER BY id_paciente
         """
         cursor.execute(sql)
         print("\n --- Lista de Pacientes ---")
         rows = cursor.fetchall()
         for row in rows:
-            print(f'ID: {row[0]}, Nome: {row[1]}, Email: {row[2]}, Telefone: {row[3]}, Senha: {row[4]}')
+            print(f'ID: {row[0]}, Nome: {row[1]}, Email: {row[2]}, Telefone: {row[3]}, Senha: {row[4]}, Acompanhante: {row[5]}')
             print('----------------------------------')
     except oracledb.Error as e:
         print(f'\nErro ao ler Pacientes: {e}')
@@ -63,7 +65,7 @@ def read_paciente():
 
 #Update
 #Atualizar um dado de um Paciente
-def update_paciente(id_paciente, novo_nome, novo_email, novo_telefone, nova_senha):
+def update_paciente(id_paciente, novo_nome, novo_email, novo_telefone, nova_senha, novo_acompanhante):
     print(f'Atualizando os dados do Paciente pelo ID')
 
     conn = getConnection()
@@ -75,13 +77,13 @@ def update_paciente(id_paciente, novo_nome, novo_email, novo_telefone, nova_senh
         sql = """
 
         UPDATE pacientes
-        set nome = :novo_nome, email = :novo_email, telefone = :novo_telefone, senha = :nova_senha WHERE id_paciente = :id_paciente
+        set nome = :novo_nome, email = :novo_email, senha = :nova_senha, telefone = :novo_telefone, acompanhante = :novo_acompanhante  WHERE id_paciente = :id_paciente
         
         """
-        cursor.execute(sql, {'novo_nome' : novo_nome, 'novo_email' : novo_email, 'novo_telefone' : novo_telefone, 'nova_senha' : nova_senha, 'id_paciente': id_paciente})
+        cursor.execute(sql, {'novo_nome' : novo_nome, 'novo_email' : novo_email, 'nova_senha' : nova_senha, 'novo_telefone' : novo_telefone, 'novo_acompanhante' : novo_acompanhante, 'id_paciente': id_paciente})
         conn.commit()
         if cursor.rowcount >0:
-            print(f' O novo Nome: {novo_nome}, Email: {novo_email}, Telefone: {novo_telefone} e Senha: {nova_senha} do Paciente: {id_paciente} foram atualizados!')
+            print(f' O novo Nome: {novo_nome}, Email: {novo_email}, Telefone: {novo_telefone}, Senha: {nova_senha} e se tem Acompanhante: {novo_acompanhante} do Paciente: {id_paciente} foram atualizados!')
         else:
             print(f'Nenhum Paciente com ID {id_paciente} foi encontrado')
 
@@ -144,11 +146,13 @@ def main_paciente():
         opcao=validar_inteiro('Digite uma opção: ')
         if opcao ==1:
             id_paciente = validar_inteiro('Digite o ID do paciente: ')
-            nome = validar_nome('Digite o nome do paaciente: ')
+            nome = validar_nome('Digite o nome do paciente: ')
             email = validar_email('Digite o email do paciente: ')
-            telefone= validar_telefone('Digite o telefone do paciente: ')
             senha = (input('Digite a senha do paciente: '))
-            create_paciente(id_paciente,nome,email,telefone,senha)
+            telefone= validar_telefone('Digite o telefone do paciente: ')
+            acompanhante = (input('O paciente terá acompanhante? (S/N): '))
+            
+            create_paciente(id_paciente,nome,email,senha,telefone,acompanhante)
     
         elif opcao==2:
             read_paciente()
@@ -159,7 +163,9 @@ def main_paciente():
             novo_email = validar_email('Digite o novo email do Paciente: ')
             novo_telefone = validar_telefone('Digite o novo telefone: ')
             nova_senha = (input('Digite a nova senha do Paciente:'))
-            update_paciente(id_paciente,novo_nome,novo_email,novo_telefone,nova_senha)
+            novo_acompanhante = (input('O paciente terá acompanhante? (S/N): '))
+            
+            update_paciente(id_paciente,novo_nome,novo_email,nova_senha,novo_telefone,novo_acompanhante)
 
         elif opcao==4:
             id_paciente = validar_inteiro('Digite o Id do Paciente: ')
