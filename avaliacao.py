@@ -79,7 +79,7 @@ def update_avaliacao(id_avaliacao, nova_nota, novo_comentario, nova_data_avaliac
         set nota = :nova_nota, comentario = :novo_comentario, data_avalicao = :nova_data_avaliacao, id_lembrete = :novo_id_lembrete WHERE id_avaliacao = :id_avaliacao
         
         """
-        cursor.execute(sql, {'nova_nota' : nova_nota, 'novo_comentario' : novo_comentario, 'nova_data_avaliacao' :nova_data_avaliacao, 'id_lembrete' : novo_id_lembrete, 'id_avaliacao': id_avaliacao})
+        cursor.execute(sql, {'nova_nota' : nova_nota, 'novo_comentario' : novo_comentario, 'nova_data_avaliacao' :nova_data_avaliacao, 'novo_id_lembrete' : novo_id_lembrete, 'id_avaliacao': id_avaliacao})
         conn.commit()
         if cursor.rowcount >0:
             print(f'A nova nota {nova_nota}, comentario: {novo_comentario}, data_avaliacao: {nova_data_avaliacao}, id_lembrete: {novo_id_lembrete}, da avaliacao de ID:{id_avaliacao} foram atualizados!')
