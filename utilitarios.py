@@ -21,12 +21,13 @@ def getConnection():
             host = "oracle.fiap.com.br",
             port = "1521",
             service_name = "orcl"
-            #dominio = dominio
         )
         print('Conexão com Oracle DB realizada!')
+        return conn
     except Exception as e:
         print(f'Erro ao obter a conexão: {e}')
-    return conn
+        return None
+
 
 # --- Valida Números Inteiros ---
 def validar_inteiro(entrada: str) -> int:

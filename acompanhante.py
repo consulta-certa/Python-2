@@ -55,7 +55,7 @@ def read_acompanhante():
         print("\n --- Lista de acompanhantes ---")
         rows = cursor.fetchall()
         for row in rows:
-            print(f'ID acompanhante: {row[0]}, email: {row[1]}, telefone: {row[2]}, grau de parentesco: {row[3]}, ID do paciente: {row[4]} e nome{[5]}')
+            print(f'ID acompanhante: {row[0]}, email: {row[1]}, telefone: {row[2]}, grau de parentesco: {row[3]}, ID do paciente: {row[4]} e nome: {row[5]}')
             print('----------------------------------')
     except oracledb.Error as e:
         print(f'\nErro ao ler acompanhantes: {e}')
@@ -78,7 +78,7 @@ def update_acompanhante(id_acompanhante, novo_email, novo_telefone, novo_parente
         sql = """
 
         UPDATE acompanhantes
-        set email = :novo_email, telefone = :novo_telefone, parentesco = :novo_parentesco, id_paciente = : novo_id_paciente, nome = :novo_nome,  WHERE id_acompanhante = :id_acompanhante
+        SET email = :novo_email, telefone = :novo_telefone, parentesco = :novo_parentesco, id_paciente = :novo_id_paciente, nome = :novo_nome WHERE id_acompanhante = :id_acompanhante
         
         """
         cursor.execute(sql, {'novo_email' : novo_email, 'novo_telefone' : novo_telefone, 'novo_parentesco' :novo_parentesco, 'novo_id_paciente' : novo_id_paciente,'novo_nome' : novo_nome, 'id_acompanhante': id_acompanhante})
@@ -174,6 +174,6 @@ def main_acompanhante():
             print('Encerrando o programa... volte sempre')
             break
         else:
-            print("❌ Opção inválida. Tente novamente com um número inteiro entre 0 e 5.")
+            print("❌ Opção inválida. Tente novamente com um número inteiro entre 1 e 5.")
             
 main_acompanhante

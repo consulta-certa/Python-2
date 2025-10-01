@@ -182,6 +182,6 @@ def main_contato():
             print('Encerrando o programa... volte sempre')
             break
         else:
-            print("❌ Opção inválida. Tente novamente com um número inteiro entre 0 e 5.")
+            print("❌ Opção inválida. Tente novamente com um número inteiro entre 1 e 5.")
 
 main_contato

@@ -61,7 +61,7 @@ def read_conversa_chatbot():
 
 #Update
 #Atualizar um dado de um conversa_chatbot
-def update_conversa_chatbot(id_conversa, nova_pergunta, nova_aprovaçao):
+def update_conversa_chatbot(id_conversa, nova_pergunta, nova_aprovacao):
     print(f'Atualizando os dados da conversa chatbot pelo ID')
 
     conn = getConnection()
@@ -73,13 +73,13 @@ def update_conversa_chatbot(id_conversa, nova_pergunta, nova_aprovaçao):
         sql = """
 
         UPDATE conversas_chatbot
-        set pergunta = :nova_pergunta, aprovacao = :nova_aprovaçao, = :novo WHERE id_conversa = :id_conversa
+        SET pergunta = :nova_pergunta, aprovacao = :nova_aprovacao WHERE id_conversa = :id_conversa
         
         """
-        cursor.execute(sql, {'nova_pergunta' : nova_pergunta, 'nova_aprovaçao' : nova_aprovaçao,'id_conversa': id_conversa})
+        cursor.execute(sql, {'nova_pergunta' : nova_pergunta, 'nova_aprovacao' : nova_aprovacao,'id_conversa': id_conversa})
         conn.commit()
         if cursor.rowcount >0:
-            print(f'A nova pergunta {nova_pergunta}, nova aprovação {nova_aprovaçao} da conversa: {id_conversa} foram atualizados!')
+            print(f'A nova pergunta {nova_pergunta}, nova aprovação {nova_aprovacao} da conversa: {id_conversa} foram atualizados!')
         else:
             print(f'Nenhuma conversa com chatbot de ID {id_conversa} foi encontrada')
 
@@ -152,8 +152,8 @@ def main_conversa_chatbot():
         elif opcao==3:
             id_conversa = validar_inteiro('Digite o Id da conversa com chatbot: ')
             nova_pergunta = validar_string('Digite a nova pergunta da conversa com chatbot: ')
-            nova_aprovaçao = (input('Digite o nova aprovação da conversa com chatbot (S/N): '))
-            update_conversa_chatbot(id_conversa,nova_pergunta,nova_aprovaçao)
+            nova_aprovacao = (input('Digite o nova aprovação da conversa com chatbot (S/N): '))
+            update_conversa_chatbot(id_conversa,nova_pergunta,nova_aprovacao)
 
         elif opcao==4:
             id_conversa = validar_inteiro('Digite o Id da conversa com chatbot: ')
@@ -163,6 +163,6 @@ def main_conversa_chatbot():
             print('Encerrando o programa... volte sempre')
             break
         else:
-            print("❌ Opção inválida. Tente novamente com um número inteiro entre 0 e 5.")
+            print("❌ Opção inválida. Tente novamente com um número inteiro entre 1 e 5.")
 
 main_conversa_chatbot
