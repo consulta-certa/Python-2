@@ -140,7 +140,7 @@ def main_avaliacao():
         print('2. Listar todas as avaliações')
         print('3. Atualizar os dados de uma avaliação')
         print('4. Excluir uma avaliação')
-        print('5. Encerrar o Programa')
+        print('5. Voltar ao menu principal')
 
         opcao=validar_inteiro('Digite uma opção: ')
         if opcao ==1:

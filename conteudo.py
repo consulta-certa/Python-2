@@ -82,7 +82,7 @@ def update_conteudo(id_conteudo, novo_tipo, novo_titulo, novo_texto, novo_video,
         set tipo = :novo_tipo, titulo = :novo_titulo, texto = :novo_texto, video = :novo_video, imagem = :nova_imagem, data_publicacao = :nova_publicacao WHERE id_conteudo = :id_conteudo
         
         """
-        cursor.execute(sql, {'novo_tipo' : novo_tipo, 'novo_titulo' : novo_titulo, 'novo_texto' :novo_texto, 'video' : novo_video, 'imagem' : nova_imagem, 'data_publicacao' : nova_publicacao, 'id_conteudo': id_conteudo})
+        cursor.execute(sql, {'novo_tipo' : novo_tipo, 'novo_titulo' : novo_titulo, 'novo_texto' :novo_texto, 'novo_video' : novo_video, 'nova_imagem' : nova_imagem, 'nova_publicacao' : nova_publicacao, 'id_conteudo': id_conteudo})
         conn.commit()
         if cursor.rowcount >0:
             print(f'O novo tipo: {novo_tipo}, titulo: {novo_titulo}, texto: {novo_texto}, video: {novo_video}, imagem: {nova_imagem} e data de publicacao: {nova_publicacao} do conteudo de ID: {id_conteudo} foram atualizados!')
@@ -143,12 +143,12 @@ def main_conteudo():
         print('2. Listar todos os conteúdos')
         print('3. Atualizar os dados de um conteúdo')
         print('4. Excluir um conteúdo')
-        print('5. Encerrar o Programa')
+        print('5. Voltar ao menu principal')
 
         opcao=validar_inteiro('Digite uma opção: ')
         if opcao ==1:
             id_conteudo = validar_inteiro('Digite o ID do conteúdo: ')
-            tipo = validar_string('Digite o tipo do conteúdo: ')
+            tipo = validar_string('Digite o tipo do conteúdo entre FAQ ou Guia (f/gp/gt): ') 
             titulo = validar_string('Digite o titulo do conteúdo: ')
             texto= validar_string('Digite o texto: ')
             video = validar_string('Digite a URL do video: ')
@@ -162,7 +162,7 @@ def main_conteudo():
 
         elif opcao==3:
             id_conteudo = validar_inteiro('Digite o Id do conteúdo: ')
-            novo_tipo = validar_string('Digite o novo tipo do conteúdo: ')
+            novo_tipo = validar_string('Digite o novo tipo do conteúdo entre FAQ ou Guia (f/gp/gt): ')
             novo_titulo = validar_string('Digite o novo titulo do conteúdo: ')
             novo_texto = validar_string('Digite o novo texto: ')
             novo_video = validar_string('Digite a nova URL do video: ')

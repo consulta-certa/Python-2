@@ -32,7 +32,7 @@ def main():
     while True:
         exibir_menu()
         
-        opcao = validar_inteiro("Escolha uma opção de 1 a 9: ")
+        opcao = validar_inteiro("Escolha uma opção de 0 a 9: ")
 
         if opcao == 1:
             main_paciente()

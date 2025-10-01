@@ -144,7 +144,7 @@ def main_contato():
         print('2. Listar todos os contatos')
         print('3. Atualizar os dados de um contato')
         print('4. Excluir um contato')
-        print('5. Encerrar o Programa')
+        print('5. Voltar ao menu principal')
 
         opcao=validar_inteiro('Digite uma opção: ')
         if opcao ==1:

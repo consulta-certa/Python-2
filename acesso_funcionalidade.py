@@ -140,7 +140,7 @@ def main_acesso():
         print('2. Listar todos os acessos')
         print('3. Atualizar os dados de um acesso')
         print('4. Excluir um acesso')
-        print('5. Encerrar o Programa')
+        print('5. Voltar ao menu principal')
 
         opcao=validar_inteiro('Digite uma opção: ')
         if opcao ==1:

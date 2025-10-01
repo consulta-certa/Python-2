@@ -142,15 +142,15 @@ def main_acompanhante():
         print('2. Listar todos os acompanhantes')
         print('3. Atualizar os dados de um acompanhante')
         print('4. Excluir um acompanhante')
-        print('5. Encerrar o Programa')
+        print('5. Voltar ao menu principal')
 
         opcao=validar_inteiro('Digite uma opção: ')
         if opcao ==1:
             id_acompanhante = validar_inteiro('Digite o ID do acompanhante: ')
             email = validar_email('Digite o email do acompanhante: ')
             telefone = validar_telefone('Digite o telefone do acompanhante: ')
-            parentesco = validar_string('Digite o parentesco do acompanhante: ')
-            id_paciente = validar_inteiro('Digite o ID do paciente relacionado')
+            parentesco = validar_string('Digite o grau de parentesco do acompanhante: ')
+            id_paciente = validar_inteiro('Digite o ID do paciente relacionado: ')
             nome = validar_nome('Digite o nome do acompanhante: ')
             create_acompanhante(id_acompanhante,email,telefone,parentesco,id_paciente,nome)
     
@@ -161,7 +161,7 @@ def main_acompanhante():
             id_acompanhante = validar_inteiro('Digite o Id do acompanhante: ')
             novo_email = validar_email('Digite o novo email do acompanhante: ')
             novo_telefone = validar_telefone('Digite o novo telefone do acompanhante: ')
-            novo_parentesco = validar_string('Digite o novo grau de parentesco: ')
+            novo_parentesco = validar_string('Digite o novo grau de parentesco do acompanhante: ')
             novo_id_paciente = validar_inteiro('Digite o novo ID do paciente relacionado: ')
             novo_nome = validar_nome('Digite o novo nome do acompanhante: ')
             update_acompanhante(id_acompanhante,novo_email,novo_telefone,novo_parentesco,novo_id_paciente,novo_nome)

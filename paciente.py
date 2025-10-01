@@ -141,7 +141,7 @@ def main_paciente():
         print('2. Listar todos os Pacientes')
         print('3. Atualizar os dados de um Paciente')
         print('4. Excluir um Paciente')
-        print('5. Encerrar o Programa')
+        print('5. Voltar ao menu principal')
 
         opcao=validar_inteiro('Digite uma opção: ')
         if opcao ==1:

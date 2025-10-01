@@ -138,7 +138,7 @@ def main_lembrete():
         print('2. Listar todos os lembretes')
         print('3. Atualizar os dados de um lembrete')
         print('4. Excluir um lembrete')
-        print('5. Encerrar o Programa')
+        print('5. Voltar ao menu principal')
 
         opcao=validar_inteiro('Digite uma opção entre 1 a 5: ')
         if opcao == 1:

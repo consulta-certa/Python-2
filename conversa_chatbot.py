@@ -137,7 +137,7 @@ def main_conversa_chatbot():
         print('2. Listar todas as conversas com chatbots')
         print('3. Atualizar os dados de uma conversa com chatbot')
         print('4. Excluir uma conversa com chatbot')
-        print('5. Encerrar o Programa')
+        print('5. Voltar ao menu principal')
 
         opcao=validar_inteiro('Digite uma opção: ')
         if opcao ==1:
