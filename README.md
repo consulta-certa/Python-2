@@ -62,9 +62,15 @@ O sistema foi desenvolvido para fins acadêmicos e pode ser expandido conforme n
 As senhas dos pacientes são armazenadas em texto puro no banco, o que não é recomendado para ambientes reais. Para produção, utilize hashing seguro (Proximos Passos).
 
 
-Autores
-[Felipe Ferrete]
-[Gustavo Bosak]
-[Nikolas Brisola]
-Vídeo explicativo - YOUTUBE
-Link para o vídeo explicativo do projeto: [inserir link do YouTube]
+## Autores
+Felipe Ferrete
+- RM562999
+
+Gustavo Bosak
+- RM566315
+
+Nikolas Brisola
+- RM564371
+
+## Vídeo explicativo - YOUTUBE
+Link para o vídeo explicativo do projeto: https://youtu.be/IXAUbEz6NIw
