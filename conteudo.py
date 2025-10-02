@@ -148,7 +148,7 @@ def main_conteudo():
         opcao=validar_inteiro('Digite uma opção: ')
         if opcao ==1:
             id_conteudo = validar_inteiro('Digite o ID do conteúdo: ')
-            tipo = validar_string('Digite o tipo do conteúdo entre FAQ ou Guia (f/gp/gt): ') 
+            tipo = validar_string('Digite o tipo do conteúdo entre entre FAQ, Portal ou Teleconsulta(f/p/t): ') 
             titulo = validar_string('Digite o titulo do conteúdo: ')
             texto= validar_string('Digite o texto: ')
             video = validar_string('Digite a URL do video: ')
@@ -162,7 +162,7 @@ def main_conteudo():
 
         elif opcao==3:
             id_conteudo = validar_inteiro('Digite o Id do conteúdo: ')
-            novo_tipo = validar_string('Digite o novo tipo do conteúdo entre FAQ ou Guia (f/gp/gt): ')
+            novo_tipo = validar_string('Digite o novo tipo do conteúdo entre FAQ, Portal ou Teleconsulta(f/p/t): ')
             novo_titulo = validar_string('Digite o novo titulo do conteúdo: ')
             novo_texto = validar_string('Digite o novo texto: ')
             novo_video = validar_string('Digite a nova URL do video: ')
