@@ -1,0 +1,26 @@
+[
+    {
+        "id_paciente": 1,
+        "nome": "Nik",
+        "email": "nik@gmail.com",
+        "telefone": "123"
+    },
+    {
+        "id_paciente": 2,
+        "nome": "Ma",
+        "email": "ma@gmail.com",
+        "telefone": "122"
+    },
+    {
+        "id_paciente": 3,
+        "nome": "nii",
+        "email": "nii@gmail.com",
+        "telefone": "1234"
+    },
+    {
+        "id_paciente": 4,
+        "nome": "Lu",
+        "email": "lu@gmail.com",
+        "telefone": "132"
+    }
+]
