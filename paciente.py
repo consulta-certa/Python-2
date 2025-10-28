@@ -1,4 +1,5 @@
 import oracledb
+import json
 from utilitarios import getConnection,validar_nome,validar_inteiro,validar_email,validar_telefone
 
 '''
@@ -128,6 +129,40 @@ def delete_paciente(id_paciente):
         if conn:
             conn.close()
 
+def exportar_pacientes_json():
+    '''
+    Exporta todos os pacientes cadastrados no banco Oracle
+    para um arquivo local 'pacientes.json'.
+    '''
+    print('\n📤 Exportando dados dos pacientes para JSON...')
+
+    conn = getConnection()
+    if not conn:
+        print('Não foi possível conectar ao banco.')
+        return
+
+    try:
+        cursor = conn.cursor()
+        cursor.execute("""
+            SELECT id_paciente, nome , email, senha, telefone, acompanhante
+            FROM pacientes ORDER BY id_paciente
+        """)
+        rows = cursor.fetchall()
+
+        pacientes = [
+            {'id_paciente': r[0], 'nome': r[1], 'email': r[2], 'telefone': r[3]}
+            for r in rows
+        ]
+
+        with open('pacientes.json', 'w', encoding='utf-8') as f:
+            json.dump(pacientes, f, ensure_ascii=False, indent=4)
+
+        print('Dados exportados com sucesso para pacientes.json.')
+
+    except Exception as e:
+        print(f'Erro ao exportar: {e}')
+    finally:
+        conn.close()
     
 
 #Programa Principal
@@ -141,7 +176,8 @@ def main_paciente():
         print('2. Listar todos os Pacientes')
         print('3. Atualizar os dados de um Paciente')
         print('4. Excluir um Paciente')
-        print('5. Voltar ao menu principal')
+        print('5. Exportar Pacientes para Json')
+        print('6. Voltar ao menu principal')
 
         opcao=validar_inteiro('Digite uma opção: ')
         if opcao ==1:
@@ -170,8 +206,11 @@ def main_paciente():
         elif opcao==4:
             id_paciente = validar_inteiro('Digite o Id do Paciente: ')
             delete_paciente(id_paciente)
-    
+        
         elif opcao == 5:
+            exportar_pacientes_json()
+    
+        elif opcao == 6:
             print('Encerrando o programa... volte sempre')
             break
         else:
