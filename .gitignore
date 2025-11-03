@@ -1,8 +1,26 @@
-# Ignora a pasta de cache do Python
+# 🐍 Cache do Python
 __pycache__/
-
-# Ignora o cache do IDE (PyCharm, IntelliJ, etc.)
-.idea/
-
-# Outros arquivos comuns para ignorar em projetos Python
 *.pyc
+*.pyo
+*.pyd
+
+# 🧠 Ambiente virtual
+venv/
+env/
+.venv/
+.env/
+
+# 💻 Configurações de IDE
+.idea/
+.vscode/
+*.swp
+
+# 🧪 Arquivos temporários
+.DS_Store
+*.log
+*.tmp
+
+# 🧾 Arquivos gerados automaticamente
+ubs_resultado.json
+*.csv
+pacientes.json
