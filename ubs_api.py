@@ -21,14 +21,14 @@ def calcular_distancia(lat1, lon1, lat2, lon2):
 
 @app.route("/ubs/perto", methods=["GET"])
 def buscar_ubs():
-    """Busca UBS próximas com base no CEP informado."""
+    """Busca UBS mais próximas com base no CEP informado."""
     cep = request.args.get("cep")
     if not cep:
         return jsonify({"erro": "CEP não informado"}), 400
 
     print(f"\n🔍 Buscando UBS para o CEP: {cep}")
 
-    # 1️⃣ Consulta o ViaCEP para obter cidade, UF e IBGE
+    # 1️⃣ Consultar o ViaCEP para cidade e UF
     via_cep_url = f"https://viacep.com.br/ws/{cep}/json/"
     resposta = requests.get(via_cep_url)
 
@@ -45,7 +45,7 @@ def buscar_ubs():
 
     print(f"🏙️ Cidade identificada: {cidade} ({uf}), IBGE: {ibge_codigo}")
 
-    # 🗺️ Obter latitude e longitude do CEP usando Nominatim
+    # 🗺️ Obter latitude/longitude do CEP (para calcular proximidade)
     nominatim_url = f"https://nominatim.openstreetmap.org/search?postalcode={cep}&country=Brazil&format=json"
     resp_coord = requests.get(nominatim_url, headers={"User-Agent": "consulta-certa-app"})
     if resp_coord.status_code == 200 and resp_coord.json():
@@ -57,32 +57,30 @@ def buscar_ubs():
         lat_usuario = lon_usuario = None
         print("⚠️ Não foi possível obter coordenadas do CEP.")
 
-    # 2️⃣ Verifica se o CSV existe
+    # 2️⃣ Ler CSV com as UBS
     if not os.path.exists(CSV_PATH):
         return jsonify({"erro": "Arquivo CSV com UBS não encontrado"}), 500
 
-    # 3️⃣ Lê o CSV
     try:
         df = pd.read_csv(CSV_PATH, sep=";", dtype=str)
     except Exception as e:
         return jsonify({"erro": f"Falha ao ler o CSV: {e}"}), 500
 
-    # Corrige vírgulas nos decimais
+    # Corrigir vírgulas nos decimais
     df["LATITUDE"] = df["LATITUDE"].str.replace(",", ".", regex=False).astype(float)
     df["LONGITUDE"] = df["LONGITUDE"].str.replace(",", ".", regex=False).astype(float)
 
-    # 4️⃣ Filtra UBS do mesmo município via código IBGE
+    # 3️⃣ Filtrar UBS da cidade (via IBGE)
     df["IBGE"] = df["IBGE"].astype(str)
     filtradas = df[df["IBGE"].str.startswith(ibge_codigo[:6])]
 
-    # 5️⃣ Se não encontrar, usa fallback pelo UF
     if filtradas.empty:
         print(f"⚠️ Nenhuma UBS encontrada com IBGE {ibge_codigo}. Retornando UBS do estado {uf}.")
         filtradas = df[df["UF"].str.upper() == uf.upper()].head(10)
     else:
         print(f"✅ {len(filtradas)} UBS encontradas para {cidade} ({uf}).")
 
-    # 6️⃣ Calcula distância (somente para ordenar)
+    # 4️⃣ Calcular distância (apenas para ordenação)
     if lat_usuario and lon_usuario:
         filtradas["DISTANCIA_KM"] = filtradas.apply(
             lambda row: calcular_distancia(
@@ -95,19 +93,23 @@ def buscar_ubs():
     else:
         filtradas["DISTANCIA_KM"] = None
 
-    # 7️⃣ Monta o JSON de resposta
-    resultados = filtradas.head(5)[["NOME", "BAIRRO", "LATITUDE", "LONGITUDE"]].to_dict(orient="records")
+    # 5️⃣ Montar resultado simplificado para o front-end
+    resultados = []
+    for _, row in filtradas.head(5).iterrows():
+        endereco = f"{row['LOGRADOURO']}, {row['BAIRRO']}, {cidade} - {uf}"
+        resultados.append({
+            "nome": row["NOME"],
+            "endereco": endereco
+        })
 
     resposta_final = {
-        "fonte": "CSV local (IBGE + proximidade)",
         "cep": cep,
         "cidade": cidade,
         "uf": uf,
-        "ibge": ibge_codigo,
         "ubs_proximas": resultados
     }
 
-    # 💾 8️⃣ Exporta o resultado da consulta para JSON local
+    # 💾 6️⃣ Exportar JSON local (para histórico)
     with open("ubs_resultado.json", "w", encoding="utf-8") as f:
         json.dump(resposta_final, f, ensure_ascii=False, indent=4)
 
@@ -116,6 +118,6 @@ def buscar_ubs():
 
 
 if __name__ == "__main__":
-    print("🏥 API Consulta Certa - UBS iniciando com cálculo de proximidade geográfica...")
+    print("🏥 API Consulta Certa - UBS iniciando com retorno simplificado para o front-end...")
     print("Acesse: http://127.0.0.1:5000/ubs/perto?cep=01001000")
     app.run(debug=True)
