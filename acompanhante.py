@@ -1,4 +1,5 @@
 import oracledb
+import json
 from utilitarios import getConnection,validar_inteiro,validar_string,validar_nome,validar_email,validar_telefone
 
 
@@ -129,7 +130,41 @@ def delete_acompanhante(id_acompanhante):
         if conn:
             conn.close()
 
-    
+
+def exportar_acompanhantes_json():
+    '''
+    Exporta todos os acompanhantes cadastrados no banco Oracle
+    para um arquivo local 'acompanhantes.json'.
+    '''
+    print('\n📤 Exportando dados dos acompanhantes para JSON...')
+
+    conn = getConnection()
+    if not conn:
+        print('Não foi possível conectar ao banco.')
+        return
+
+    try:
+        cursor = conn.cursor()
+        cursor.execute("""
+            SELECT id_acompanhante, email , telefone, parentesco, id_paciente, nome
+            FROM acompanhantes ORDER BY id_acompanhante
+        """)
+        rows = cursor.fetchall() 
+
+        acompanhantes = [
+            {'id_acompanhante': row[0], 'email': row[1],'telefone': row[2],'parentesco': row[3], 'id_paciente': row[4], 'nome' : row[5]}
+            for row in rows
+        ]
+
+        with open('acompanhantes.json', 'w', encoding='utf-8') as f:
+            json.dump(acompanhantes, f, ensure_ascii=False, indent=4)
+
+        print('Dados exportados com sucesso para acompanhantes.json.')
+
+    except Exception as e:
+        print(f'Erro ao exportar: {e}')
+    finally:
+        conn.close()
 
 #Programa Principal
 
@@ -142,7 +177,8 @@ def main_acompanhante():
         print('2. Listar todos os acompanhantes')
         print('3. Atualizar os dados de um acompanhante')
         print('4. Excluir um acompanhante')
-        print('5. Voltar ao menu principal')
+        print('5. Exportar Acompanhantes para Json')
+        print('6. Voltar ao menu principal')
 
         opcao=validar_inteiro('Digite uma opção: ')
         if opcao ==1:
@@ -171,9 +207,13 @@ def main_acompanhante():
             delete_acompanhante(id_acompanhante)
     
         elif opcao == 5:
+            exportar_acompanhantes_json()
+
+        elif opcao == 6:
             print('Encerrando o programa... volte sempre')
             break
         else:
-            print("❌ Opção inválida. Tente novamente com um número inteiro entre 1 e 5.")
-            
-main_acompanhante
+            print("❌ Opção inválida. Tente novamente com um número inteiro entre 1 e 6.")
+
+if __name__ == "__main__":
+    main_acompanhante()

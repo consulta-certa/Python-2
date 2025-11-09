@@ -81,7 +81,7 @@ def update_acesso(id, nova_funcionalidade, nova_quantidade_acessos, novo_tempo_p
         sql = """
 
         UPDATE CC_ACESSOS_FUNCIONALIDADE
-        set funcionalidade = :nova_funcionalidade, quantidade_acessos = :nova_quantidade_acessos, tempo_permanencia_seg = :novo_tempo_permanencia_seg, data_acesso =: nova_data_acesso, novo_id_paciente WHERE id = :id
+        set funcionalidade = :nova_funcionalidade, quantidade_acessos = :nova_quantidade_acessos, tempo_permanencia_seg = :novo_tempo_permanencia_seg, data_acesso = :nova_data_acesso, id_paciente = :novo_id_paciente WHERE id = :id
         
         """
         cursor.execute(sql,{'nova_funcionalidade' : nova_funcionalidade, 'nova_quantidade_acessos' : nova_quantidade_acessos, 'novo_tempo_permanencia_seg' : novo_tempo_permanencia_seg, 'nova_data_acesso': nova_data_acesso, 'novo_id_paciente' : novo_id_paciente, 'id': id})
@@ -138,7 +138,7 @@ def exportar_acessos_json():
     Exporta todos os acessos cadastrados no banco Oracle
     para um arquivo local 'acessos.json'.
     '''
-    print('\n📤 Exportando dados dos pacientes para JSON...')
+    print('\n📤 Exportando dados dos acessos para JSON...')
 
     conn = getConnection()
     if not conn:
@@ -154,14 +154,14 @@ def exportar_acessos_json():
         rows = cursor.fetchall() 
 
         acessos = [
-            {'id': row[0], 'funcionalidade': row[1],'quantidade_acessos': row[2],'tempo_permanencia_seg': row[3], 'teledata_acessofone': row[4], 'id_paciente' : row[5]}
+            {'id': row[0], 'funcionalidade': row[1],'quantidade_acessos': row[2],'tempo_permanencia_seg': row[3], 'data_acesso': row[4], 'id_paciente' : row[5]}
             for row in rows
         ]
 
-        with open('pacientes.json', 'w', encoding='utf-8') as f:
+        with open('acessos.json', 'w', encoding='utf-8') as f:
             json.dump(acessos, f, ensure_ascii=False, indent=4)
 
-        print('Dados exportados com sucesso para pacientes.json.')
+        print('Dados exportados com sucesso para acessos.json.')
 
     except Exception as e:
         print(f'Erro ao exportar: {e}')
@@ -180,15 +180,15 @@ def main_acesso():
         print('2. Listar todos os acessos')
         print('3. Atualizar os dados de um acesso')
         print('4. Excluir um acesso')
-        print('5. Exportar Pacientes para Json')
+        print('5. Exportar acessos para Json')
         print('6. Voltar ao menu principal')
 
         opcao=validar_inteiro('Digite uma opção: ')
         if opcao ==1:
             id = validar_inteiro('Digite o ID do acesso: ')
             funcionalidade = validar_string('Digite a Funcionalidade do acesso: ')
-            quantidade_acessos = validar_string('Digite a quantidade de acessos: ')
-            tempo_permanencia_seg= validar_string('Digite o tempo de permanencia em segundos: ')
+            quantidade_acessos = validar_inteiro('Digite a quantidade de acessos: ')
+            tempo_permanencia_seg= validar_inteiro('Digite o tempo de permanencia em segundos: ')
             data_acesso=validar_data('Digite a data de acesso: ')
             id_paciente=validar_inteiro('Digite o id do paciente: ')
             create_acesso(id,funcionalidade,quantidade_acessos,tempo_permanencia_seg, data_acesso, id_paciente)
@@ -199,8 +199,8 @@ def main_acesso():
         elif opcao==3:
             id = validar_inteiro('Digite o Id do acesso: ')
             nova_funcionalidade = validar_string('Digite a nova funcionalidade do acesso: ')
-            nova_quantidade_acessos = validar_string('Digite a nova quantidade de acessos do acesso: ')
-            novo_tempo_permanencia_seg = validar_string('Digite o novo tempo de permanencia em segundos: ')
+            nova_quantidade_acessos = validar_inteiro('Digite a nova quantidade de acessos do acesso: ')
+            novo_tempo_permanencia_seg = validar_inteiro('Digite o novo tempo de permanencia em segundos: ')
             nova_data_acesso=validar_data('Digite a nova data de acesso: ')
             novo_id_paciente=validar_inteiro('Digite o novo id do paciente: ')
             update_acesso(id,nova_funcionalidade,nova_quantidade_acessos,novo_tempo_permanencia_seg,nova_data_acesso,novo_id_paciente)
@@ -216,6 +216,7 @@ def main_acesso():
             print('Encerrando o programa... volte sempre')
             break
         else:
-            print("❌ Opção inválida. Tente novamente com um número inteiro entre 1 e 5.")
+            print("❌ Opção inválida. Tente novamente com um número inteiro entre 1 e 6.")
 
-main_acesso
+if __name__ == "__main__":
+    main_acesso()

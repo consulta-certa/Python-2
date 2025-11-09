@@ -1,4 +1,5 @@
 import oracledb
+import json
 from utilitarios import getConnection,validar_string,validar_inteiro
 
 '''
@@ -124,7 +125,40 @@ def delete_conversa_chatbot(id_conversa):
         if conn:
             conn.close()
 
-    
+def exportar_conversas_chatbot_json():
+    '''
+    Exporta todas as conversas do chatbot cadastradas no banco Oracle
+    para um arquivo local 'conversas_chatbot.json'.
+    '''
+    print('\n📤 Exportando dados das conversas do chatbot para JSON...')
+
+    conn = getConnection()
+    if not conn:
+        print('Não foi possível conectar ao banco.')
+        return
+
+    try:
+        cursor = conn.cursor()
+        cursor.execute("""
+            SELECT id_conversa, pergunta, aprovacao
+            FROM conversas_chatbot ORDER BY id_conversa
+        """)
+        rows = cursor.fetchall() 
+
+        conversas = [
+            {'id_conversa': row[0], 'pergunta': row[1],'aprovacao': row[2]}
+            for row in rows
+        ]
+
+        with open('conversas_chatbot.json', 'w', encoding='utf-8') as f:
+            json.dump(conversas, f, ensure_ascii=False, indent=4)
+
+        print('Dados exportados com sucesso para conversas_chatbot.json.')
+
+    except Exception as e:
+        print(f'Erro ao exportar: {e}')
+    finally:
+        conn.close()
 
 #Programa Principal
 
@@ -137,7 +171,8 @@ def main_conversa_chatbot():
         print('2. Listar todas as conversas com chatbots')
         print('3. Atualizar os dados de uma conversa com chatbot')
         print('4. Excluir uma conversa com chatbot')
-        print('5. Voltar ao menu principal')
+        print('5. Exportar Conversas para Json')
+        print('6. Voltar ao menu principal')
 
         opcao=validar_inteiro('Digite uma opção: ')
         if opcao ==1:
@@ -158,11 +193,15 @@ def main_conversa_chatbot():
         elif opcao==4:
             id_conversa = validar_inteiro('Digite o Id da conversa com chatbot: ')
             delete_conversa_chatbot(id_conversa)
-    
+
         elif opcao == 5:
+            exportar_conversas_chatbot_json()
+    
+        elif opcao == 6:
             print('Encerrando o programa... volte sempre')
             break
         else:
-            print("❌ Opção inválida. Tente novamente com um número inteiro entre 1 e 5.")
+            print("❌ Opção inválida. Tente novamente com um número inteiro entre 1 e 6.")
 
-main_conversa_chatbot
+if __name__ == "__main__":
+    main_conversa_chatbot()

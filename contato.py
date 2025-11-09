@@ -1,4 +1,5 @@
 import oracledb
+import json
 from utilitarios import getConnection,validar_inteiro,validar_string,validar_nome,validar_email,validar_telefone,validar_cep
 
 '''
@@ -131,7 +132,40 @@ def delete_contato(id_contato):
         if conn:
             conn.close()
 
-    
+def exportar_contatos_json():
+    '''
+    Exporta todos os contatos cadastrados no banco Oracle
+    para um arquivo local 'contatos.json'.
+    '''
+    print('\n📤 Exportando dados dos contatos para JSON...')
+
+    conn = getConnection()
+    if not conn:
+        print('Não foi possível conectar ao banco.')
+        return
+
+    try:
+        cursor = conn.cursor()
+        cursor.execute("""
+            SELECT id_contato, nome, telefone, email, numero, rua, bairro, cidade, cep
+            FROM contatos ORDER BY id_contato
+        """)
+        rows = cursor.fetchall() 
+
+        contatos = [
+            {'id_contato': row[0], 'nome': row[1],'telefone': row[2],'email': row[3], 'numero': row[4], 'rua': row[5], 'bairro': row[6], 'cidade': row[7], 'cep': row[8]}
+            for row in rows
+        ]
+
+        with open('contatos.json', 'w', encoding='utf-8') as f:
+            json.dump(contatos, f, ensure_ascii=False, indent=4)
+
+        print('Dados exportados com sucesso para contatos.json.')
+
+    except Exception as e:
+        print(f'Erro ao exportar: {e}')
+    finally:
+        conn.close()
 
 #Programa Principal
 
@@ -144,7 +178,8 @@ def main_contato():
         print('2. Listar todos os contatos')
         print('3. Atualizar os dados de um contato')
         print('4. Excluir um contato')
-        print('5. Voltar ao menu principal')
+        print('5. Exportar Contatos para Json')
+        print('6. Voltar ao menu principal')
 
         opcao=validar_inteiro('Digite uma opção: ')
         if opcao ==1:
@@ -177,11 +212,15 @@ def main_contato():
         elif opcao==4:
             id_contato = validar_inteiro('Digite o Id do contato: ')
             delete_contato(id_contato)
-    
+
         elif opcao == 5:
+            exportar_contatos_json()
+    
+        elif opcao == 6:
             print('Encerrando o programa... volte sempre')
             break
         else:
-            print("❌ Opção inválida. Tente novamente com um número inteiro entre 1 e 5.")
+            print("❌ Opção inválida. Tente novamente com um número inteiro entre 1 e 6.")
 
-main_contato
+if __name__ == "__main__":
+    main_contato()

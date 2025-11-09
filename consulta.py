@@ -1,4 +1,5 @@
 import oracledb
+import json
 from utilitarios import getConnection,validar_string,validar_inteiro,validar_data
 
 
@@ -132,7 +133,40 @@ def delete_consulta(id_consulta):
         if conn:
             conn.close()
 
-    
+def exportar_consultas_json():
+    '''
+    Exporta todas as consultas cadastradas no banco Oracle
+    para um arquivo local 'consultas.json'.
+    '''
+    print('\n📤 Exportando dados das consultas para JSON...')
+
+    conn = getConnection()
+    if not conn:
+        print('Não foi possível conectar ao banco.')
+        return
+
+    try:
+        cursor = conn.cursor()
+        cursor.execute("""
+            SELECT id_consulta, especialidade, data_consulta, status, id_paciente
+            FROM consultas ORDER BY id_consulta
+        """)
+        rows = cursor.fetchall() 
+
+        consultas = [
+            {'id_consulta': row[0], 'especialidade': row[1],'data_consulta': row[2],'status': row[3], 'id_paciente': row[4]}
+            for row in rows
+        ]
+
+        with open('consultas.json', 'w', encoding='utf-8') as f:
+            json.dump(consultas, f, ensure_ascii=False, indent=4)
+
+        print('Dados exportados com sucesso para consultas.json.')
+
+    except Exception as e:
+        print(f'Erro ao exportar: {e}')
+    finally:
+        conn.close()
 
 #Programa Principal
 
@@ -145,7 +179,8 @@ def main_consulta():
         print('2. Listar todas as Consultas')
         print('3. Atualizar os dados de uma Consulta')
         print('4. Excluir uma Consulta')
-        print('5. Voltar ao menu principal')
+        print('5. Exportar Consultas para Json')
+        print('6. Voltar ao menu principal')
 
         opcao=validar_inteiro('Digite uma opção: ')
         if opcao ==1:
@@ -170,11 +205,15 @@ def main_consulta():
         elif opcao==4:
             id_consulta = validar_inteiro('Digite o Id da Consulta: ')
             delete_consulta(id_consulta)
-    
+
         elif opcao == 5:
+            exportar_consultas_json()
+    
+        elif opcao == 6:
             print('Encerrando o programa... volte sempre')
             break
         else:
-            print("❌ Opção inválida. Tente novamente com um número inteiro entre 1 e 5.")
+            print("❌ Opção inválida. Tente novamente com um número inteiro entre 1 e 6.")
 
-main_consulta
+if __name__ == "__main__":
+    main_consulta()

@@ -1,4 +1,5 @@
 import oracledb
+import json
 from utilitarios import getConnection,validar_inteiro,validar_string,validar_data
 
 '''
@@ -130,6 +131,40 @@ def delete_conteudo(id_conteudo):
         if conn:
             conn.close()
 
+def exportar_conteudos_json():
+    '''
+    Exporta todos os conteudos cadastrados no banco Oracle
+    para um arquivo local 'conteudos.json'.
+    '''
+    print('\n📤 Exportando dados dos conteudos para JSON...')
+
+    conn = getConnection()
+    if not conn:
+        print('Não foi possível conectar ao banco.')
+        return
+
+    try:
+        cursor = conn.cursor()
+        cursor.execute("""
+            SELECT id_conteudo, tipo, titulo, texto, video, imagem, data_publicacao
+            FROM conteudos ORDER BY id_conteudo
+        """)
+        rows = cursor.fetchall() 
+
+        conteudos = [
+            {'id_conteudo': row[0], 'tipo': row[1],'titulo': row[2],'texto': row[3], 'video': row[4], 'imagem': row[5], 'data_publicacao': row[6]}
+            for row in rows
+        ]
+
+        with open('conteudos.json', 'w', encoding='utf-8') as f:
+            json.dump(conteudos, f, ensure_ascii=False, indent=4)
+
+        print('Dados exportados com sucesso para conteudos.json.')
+
+    except Exception as e:
+        print(f'Erro ao exportar: {e}')
+    finally:
+        conn.close()
     
 
 #Programa Principal
@@ -143,7 +178,8 @@ def main_conteudo():
         print('2. Listar todos os conteúdos')
         print('3. Atualizar os dados de um conteúdo')
         print('4. Excluir um conteúdo')
-        print('5. Voltar ao menu principal')
+        print('5. Exportar Conteúdos para Json')
+        print('6. Voltar ao menu principal')
 
         opcao=validar_inteiro('Digite uma opção: ')
         if opcao ==1:
@@ -173,11 +209,15 @@ def main_conteudo():
         elif opcao==4:
             id_conteudo = validar_inteiro('Digite o Id do conteudo: ')
             delete_conteudo(id_conteudo)
-    
+
         elif opcao == 5:
+            exportar_conteudos_json()
+    
+        elif opcao == 6:
             print('Encerrando o programa... volte sempre')
             break
         else:
-            print("❌ Opção inválida. Tente novamente com um número inteiro entre 1 e 5.")        
+            print("❌ Opção inválida. Tente novamente com um número inteiro entre 1 e 6.")
 
-main_conteudo
+if __name__ == "__main__":
+    main_conteudo()

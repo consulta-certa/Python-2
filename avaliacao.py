@@ -1,4 +1,5 @@
 import oracledb
+import json
 from utilitarios import getConnection,validar_string,validar_inteiro,validar_data
 
 '''
@@ -6,7 +7,7 @@ from utilitarios import getConnection,validar_string,validar_inteiro,validar_dat
 data_avaliacao e id_lembrete.
 '''
 #Operações CRUD
-def create_avaliacao(id_avaliacao, nota, comentario, data_avaliacao, id_lembrete,):
+def create_avaliacao(id_avaliacao, nota, comentario, data_avaliacao, id_lembrete):
     print('*** Inserindo uma nova avaliação na tabela avaliacoes ***')
     conn = getConnection()
 
@@ -17,18 +18,18 @@ def create_avaliacao(id_avaliacao, nota, comentario, data_avaliacao, id_lembrete
     try:
         cursor = conn.cursor() #obter um cursor
         sql = """
-            INSERT INTO avaliacoes (id_avaliacao, nota, comentario, data_avalicao, id_lembrete)
-            VALUES (:id_avaliacao, :nota, :comentario, :data_avalicao, :id_lembrete)
+            INSERT INTO avaliacoes (id_avaliacao, nota, comentario, data_avaliacao, id_lembrete)
+            VALUES (:id_avaliacao, :nota, :comentario, :data_avaliacao, :id_lembrete)
         """
         cursor.execute(sql, {
             'id_avaliacao' : id_avaliacao,
             'nota' : nota,
             'comentario' : comentario,
-            'data_avalicao' : data_avaliacao,
+            'data_avaliacao' : data_avaliacao,
             'id_lembrete' : id_lembrete
         })
         conn.commit()
-        print(f' A avaliação de ID: {id_avaliacao}, nota: {nota}, comentario: {comentario}, data_avalicao: {data_avaliacao} e id_lembrete: {id_lembrete} foi adicionado com sucesso!')
+        print(f' A avaliação de ID: {id_avaliacao}, nota: {nota}, comentario: {comentario}, data_avaliacao: {data_avaliacao} e id_lembrete: {id_lembrete} foi adicionado com sucesso!')
     except oracledb.Error as e:
         print(f'\nErro ao inserir avaliação: {e}')
         conn.rollback()
@@ -46,14 +47,14 @@ def read_avaliacao():
     try:
         cursor = conn.cursor()
         sql = """
-            SELECT id_avaliacao, nota, comentario, data_avalicao, id_lembrete
+            SELECT id_avaliacao, nota, comentario, data_avaliacao, id_lembrete
             FROM avaliacoes ORDER BY id_avaliacao
         """
         cursor.execute(sql)
         print("\n --- Lista de avaliações ---")
         rows = cursor.fetchall()
         for row in rows:
-            print(f'ID: {row[0]}, nota: {row[1]}, comentario: {row[2]}, data_avalicao: {row[3]}, id_lembrete: {row[4]}')
+            print(f'ID: {row[0]}, nota: {row[1]}, comentario: {row[2]}, data_avaliacao: {row[3]}, id_lembrete: {row[4]}')
             print('----------------------------------')
     except oracledb.Error as e:
         print(f'\nErro ao ler as avaliações: {e}')
@@ -76,7 +77,7 @@ def update_avaliacao(id_avaliacao, nova_nota, novo_comentario, nova_data_avaliac
         sql = """
 
         UPDATE avaliacoes
-        set nota = :nova_nota, comentario = :novo_comentario, data_avalicao = :nova_data_avaliacao, id_lembrete = :novo_id_lembrete WHERE id_avaliacao = :id_avaliacao
+        set nota = :nova_nota, comentario = :novo_comentario, data_avaliacao = :nova_data_avaliacao, id_lembrete = :novo_id_lembrete WHERE id_avaliacao = :id_avaliacao
         
         """
         cursor.execute(sql, {'nova_nota' : nova_nota, 'novo_comentario' : novo_comentario, 'nova_data_avaliacao' :nova_data_avaliacao, 'novo_id_lembrete' : novo_id_lembrete, 'id_avaliacao': id_avaliacao})
@@ -127,7 +128,40 @@ def delete_avaliacao(id_avaliacao):
         if conn:
             conn.close()
 
-    
+def exportar_avaliacoes_json():
+    '''
+    Exporta todas as avaliações cadastradas no banco Oracle
+    para um arquivo local 'avaliacoes.json'.
+    '''
+    print('\n📤 Exportando dados das avaliações para JSON...')
+
+    conn = getConnection()
+    if not conn:
+        print('Não foi possível conectar ao banco.')
+        return
+
+    try:
+        cursor = conn.cursor()
+        cursor.execute("""
+            SELECT id_avaliacao, nota, comentario, data_avaliacao, id_lembrete
+            FROM avaliacoes ORDER BY id_avaliacao
+        """)
+        rows = cursor.fetchall() 
+
+        avaliacoes = [
+            {'id_avaliacao': row[0], 'nota': row[1],'comentario': row[2],'data_avaliacao': row[3], 'id_lembrete': row[4]}
+            for row in rows
+        ]
+
+        with open('avaliacoes.json', 'w', encoding='utf-8') as f:
+            json.dump(avaliacoes, f, ensure_ascii=False, indent=4)
+
+        print('Dados exportados com sucesso para avaliacoes.json.')
+
+    except Exception as e:
+        print(f'Erro ao exportar: {e}')
+    finally:
+        conn.close()
 
 #Programa Principal
 
@@ -140,7 +174,8 @@ def main_avaliacao():
         print('2. Listar todas as avaliações')
         print('3. Atualizar os dados de uma avaliação')
         print('4. Excluir uma avaliação')
-        print('5. Voltar ao menu principal')
+        print('5. Exportar Avaliações para Json')
+        print('6. Voltar ao menu principal')
 
         opcao=validar_inteiro('Digite uma opção: ')
         if opcao ==1:
@@ -165,11 +200,15 @@ def main_avaliacao():
         elif opcao==4:
             id_avaliacao = validar_inteiro('Digite o Id da avaliação: ')
             delete_avaliacao(id_avaliacao)
-    
+
         elif opcao == 5:
+            exportar_avaliacoes_json()
+    
+        elif opcao == 6:
             print('Encerrando o programa... volte sempre')
             break
         else:
-            print("❌ Opção inválida. Tente novamente com um número inteiro entre 1 e 5.")
-            
-main_avaliacao
+            print("❌ Opção inválida. Tente novamente com um número inteiro entre 1 e 6.")
+
+if __name__ == "__main__":
+    main_avaliacao()

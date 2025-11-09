@@ -1,4 +1,5 @@
 import oracledb
+import json
 from utilitarios import getConnection,validar_string,validar_inteiro,validar_data
 
 '''
@@ -125,6 +126,40 @@ def delete_lembrete(id_lembrete):
         if conn:
             conn.close()
 
+def exportar_lembretes_json():
+    '''
+    Exporta todos os lembretes cadastrados no banco Oracle
+    para um arquivo local 'lembretes.json'.
+    '''
+    print('\n📤 Exportando dados dos lembretes para JSON...')
+
+    conn = getConnection()
+    if not conn:
+        print('Não foi possível conectar ao banco.')
+        return
+
+    try:
+        cursor = conn.cursor()
+        cursor.execute("""
+            SELECT id_lembrete, data_envio, id_consulta
+            FROM lembretes ORDER BY id_lembrete
+        """)
+        rows = cursor.fetchall() 
+
+        lembretes = [
+            {'id_lembrete': row[0], 'data_envio': row[1],'id_consulta': row[2]}
+            for row in rows
+        ]
+
+        with open('lembretes.json', 'w', encoding='utf-8') as f:
+            json.dump(lembretes, f, ensure_ascii=False, indent=4)
+
+        print('Dados exportados com sucesso para lembretes.json.')
+
+    except Exception as e:
+        print(f'Erro ao exportar: {e}')
+    finally:
+        conn.close()
     
 
 #Programa Principal
@@ -138,9 +173,10 @@ def main_lembrete():
         print('2. Listar todos os lembretes')
         print('3. Atualizar os dados de um lembrete')
         print('4. Excluir um lembrete')
-        print('5. Voltar ao menu principal')
+        print('5. Exportar Lembretes para Json')
+        print('6. Voltar ao menu principal')
 
-        opcao=validar_inteiro('Digite uma opção entre 1 a 5: ')
+        opcao=validar_inteiro('Digite uma opção entre 1 a 6: ')
         if opcao == 1:
             id_lembrete = validar_inteiro('Digite o ID do lembrete: ')
             data_envio = validar_data('Digite a data e hora de envio (DD/MM/AAAA HH:MM): ')
@@ -161,11 +197,15 @@ def main_lembrete():
         elif opcao==4:
             id_lembrete = validar_inteiro('Digite o Id do lembrete: ')
             delete_lembrete(id_lembrete)
-    
+
         elif opcao == 5:
+            exportar_lembretes_json()
+    
+        elif opcao == 6:
             print('Encerrando o programa... volte sempre')
             break
         else:
-            print("❌ Opção inválida. Tente novamente com um número inteiro entre 1 e 5.")
+            print("❌ Opção inválida. Tente novamente com um número inteiro entre 1 e 6.")
 
-main_lembrete
+if __name__ == "__main__":
+    main_lembrete()
