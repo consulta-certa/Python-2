@@ -2,6 +2,7 @@ import oracledb
 from datetime import datetime
 import regex
 import re
+import uuid
 
 
 
@@ -77,7 +78,7 @@ def validar_nome(mensagem: str) -> str:
         nome_tratado = entrada.strip()
 
         # Padrão para letras, incluindo acentos e espaços (ajustado para melhor cobertura Unicode)
-        padrao = r'^[A-Za-zÀ-ÖØ-öø-ÿ\s]+$' 
+        padrao = r'^[A-Za-zÀ-ÖØ-öø-ÿ\s]+$'
 
         if nome_tratado and re.fullmatch(padrao, nome_tratado):
             return nome_tratado
@@ -99,7 +100,7 @@ def validar_email(mensagem: str) -> str:
         entrada = input(mensagem)
         email_tratado = entrada.strip().lower()
 
-        # Usa regex.fullmatch, que é mais robusto para UNICODE. 
+        # Usa regex.fullmatch, que é mais robusto para UNICODE.
         # Se usar 're', remova o 'flags' ou use re.IGNORECASE.
         if regex.fullmatch(padrao, email_tratado, flags=regex.UNICODE | regex.IGNORECASE):
             return email_tratado
@@ -114,7 +115,7 @@ def validar_cep(mensagem: str) -> str:
     Retorna o CEP como string (sem higienização automática).
     """
     padrao = r'^\d{5}-?\d{3}$'
-    
+
     while True:
         entrada = input(mensagem)
         # O código original usava 'regex.fullmatch', mantendo a compatibilidade com 'regex'
@@ -132,19 +133,19 @@ def validar_telefone(mensagem: str) -> str:
     """
     # Padrão que aceita formatos comuns, mas a validação final será por comprimento
     # (Ex: (11) 98765-4321 ou 11987654321)
-    
+
     while True:
         entrada = input(mensagem)
 
         # Remove todos os caracteres não numéricos: espaços, parênteses e hífens
         telefone_limpo = re.sub(r'[\s\(\)-]', '', entrada)
-        
+
         # Valida se tem exatamente 11 dígitos e são todos numéricos
         if len(telefone_limpo) == 11 and telefone_limpo.isdigit():
             return telefone_limpo
         else:
             print("Operação cancelada. Inserir um telefone válido (ex: 11987654321 ou (11) 98765-4321).")
-            
+
 def validar_booleano(mensagem: str) -> bool:
     """
     Solicita uma entrada e força uma resposta booleana (True ou False).
@@ -157,11 +158,11 @@ def validar_booleano(mensagem: str) -> bool:
         # Define as respostas que significam True
         if entrada in ('s', 'sim', 'true', '1', 'ok', 'S', 'SIM'):
             return True
-        
+
         # Define as respostas que significam False
         elif entrada in ('n', 'não', 'nao', 'false', '0', 'cancelar', 'NAO', 'NÃO'):
             return False
-            
+
         # Se não for uma resposta válida, informa o erro e o loop repete
         else:
             print("Entrada inválida. Por favor, digite 'sim' ou 'não' (ou variações como 's'/'n').")
@@ -175,7 +176,7 @@ def validar_string(mensagem: str, minimo: int = 1, maximo: int = 100) -> str:
         entrada = input(mensagem)
         # 1. Remove espaços em branco do início e fim
         string_tratada = entrada.strip()
-        
+
         tamanho = len(string_tratada)
 
         # 2. Verifica se está vazia ou contém apenas espaços
@@ -188,7 +189,35 @@ def validar_string(mensagem: str, minimo: int = 1, maximo: int = 100) -> str:
             print(f"Entrada inválida. O valor deve ter pelo menos {minimo} caracteres.")
         elif tamanho > maximo:
             print(f"Entrada inválida. O valor deve ter no máximo {maximo} caracteres.")
-        
+
         # 4. Se passar por todas as verificações, retorna
         else:
             return string_tratada
+
+def validar_id():
+    """
+    Gera um ID único no formato UUID4.
+    """
+    return str(uuid.uuid4())
+
+def validar_sexo(mensagem: str) -> str:
+    """
+    Solicita o sexo do usuário e garante que seja 'm' ou 'f'.
+    """
+    while True:
+        sexo = input(mensagem).lower()
+        if sexo in ('m', 'f'):
+            return sexo
+        else:
+            print("Entrada inválida. Por favor, digite 'm' para masculino ou 'f' para feminino.")
+
+def validar_tipo(mensagem: str) -> str:
+    """
+    Solicita o tipo de conteúdo e garante que seja 'f', 'p', 't' ou 'i'.
+    """
+    while True:
+        tipo = input(mensagem).lower()
+        if tipo in ('f', 'p', 't', 'i'):
+            return tipo
+        else:
+            print("Entrada inválida. Por favor, digite 'f' para...FAQ, 'p' para Portal do Paciente, 't' para Teleconsultas ou 'i' para Informações Gerais")
