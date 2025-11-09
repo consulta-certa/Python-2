@@ -23,4 +23,5 @@ env/
 # 🧾 Arquivos gerados automaticamente
 ubs_resultado.json
 *.csv
-pacientes.json
+pacientes.
+*.json
