@@ -173,7 +173,7 @@ def main_avaliacao():
                     break
                 else:
                     print('Nota inválida. Por favor, insira um valor entre 0 e 5.')
-            comentario = validar_string('Digite um comentário sobre a consulta: ', maximo=255)
+            comentario = validar_string('Digite um comentário sobre a consulta: ')
             data_avaliacao = validar_data('Digite a data da avaliação (DD/MM/AAAA HH:MM): ')
             create_avaliacao(id, nota, comentario, data_avaliacao)
     
@@ -188,7 +188,7 @@ def main_avaliacao():
                     break
                 else:
                     print('Nota inválida. Por favor, insira um valor entre 0 e 5.')
-            novo_comentario = validar_string('Digite o novo comentário da avaliação: ', maximo=255)
+            novo_comentario = validar_string('Digite o novo comentário da avaliação: ')
             nova_data_avaliacao = validar_data('Digite a nova data da avaliação (DD/MM/AAAA HH:MM): ')
             update_avaliacao(id, nova_nota, novo_comentario, nova_data_avaliacao)
 

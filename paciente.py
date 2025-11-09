@@ -178,9 +178,9 @@ def main_paciente():
         opcao=validar_inteiro('Digite uma opção entre 1 e 6: ')
         if opcao ==1:
             id = validar_id()
-            nome = validar_nome('Digite o nome do paciente: ', maximo=50)
+            nome = validar_nome('Digite o nome do paciente: ')
             email = validar_email('Digite o email do paciente: ')
-            senha = validar_string('Digite a senha do paciente: ', maximo=12)
+            senha = validar_string('Digite a senha do paciente: ')
             telefone= validar_telefone('Digite o telefone do paciente: ')
             acompanhantes = validar_acompanhantes()
             
@@ -191,9 +191,9 @@ def main_paciente():
 
         elif opcao==3:
             id = validar_string('Digite o Id do Paciente que deseja atualizar: ')
-            novo_nome = validar_nome('Digite o novo Nome do Paciente: ', maximo=50)
+            novo_nome = validar_nome('Digite o novo Nome do Paciente: ')
             novo_email = validar_email('Digite o novo email do Paciente: ')
-            nova_senha = validar_string('Digite a nova senha do Paciente:', maximo=12)
+            nova_senha = validar_string('Digite a nova senha do Paciente:')
             novo_telefone = validar_telefone('Digite o novo telefone: ')
             novo_acompanhantes = validar_acompanhantes()
             
