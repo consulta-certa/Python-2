@@ -8,7 +8,7 @@ from conversa_chatbot import main_conversa_chatbot
 from conteudo import main_conteudo
 from acesso_funcionalidade import main_acesso
 from utilitarios import validar_inteiro
-from integracao import menu_integracoes
+from api_ubs_client import buscar_ubs_por_cep
 
 
 
@@ -26,7 +26,7 @@ def exibir_menu():
     print("7.  Gerenciar Conversas Chatbot.")
     print("8.  Gerenciar Conteúdos.")
     print("9.  Gerenciar Acessos de Funcionalidade")
-    print("10. Gerenciar Integrações (Exportar Json/ViaCep)")
+    print("10. Gerenciar Integrações (Buscar ubs perto)")
     print("0. Sair: Encerra o Sistema Consulta Certa.")
     print("="*40)
 
@@ -56,7 +56,7 @@ def main():
         elif opcao == 9:
             main_acesso()
         elif opcao == 10:
-            menu_integracoes()
+            buscar_ubs_por_cep()
         elif opcao == 0:
             print("\n👋 Encerrando o sistema... até logo!")
             break
