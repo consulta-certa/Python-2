@@ -178,7 +178,7 @@ def main_consulta():
         opcao=validar_inteiro('Digite uma opção entre 1 e 6: ')
         if opcao ==1:
             id = validar_id()
-            especialidade = validar_string('Digite a especialidade da consulta: ', maximo=50)
+            especialidade = validar_string('Digite a especialidade da consulta: ')
             data_consulta = validar_data('Digite a data da consulta (DD/MM/AAAA HH:MM): ')
             ativa = validar_status_consulta()
             id_paciente = validar_string('Digite o ID do Paciente: ')
@@ -189,7 +189,7 @@ def main_consulta():
 
         elif opcao==3:
             id = validar_string('Digite o Id da Consulta que deseja atualizar: ')
-            nova_especialidade = validar_string('Digite a nova especialidade da Consulta: ', maximo=50)
+            nova_especialidade = validar_string('Digite a nova especialidade da Consulta: ')
             nova_data_consulta = validar_data('Digite a nova data da Consulta (DD/MM/AAAA HH:MM): ')
             nova_ativa = validar_status_consulta()
             novo_id_paciente = validar_string('Digite o novo Id do Paciente: ')
