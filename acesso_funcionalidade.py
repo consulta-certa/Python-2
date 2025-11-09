@@ -1,17 +1,10 @@
 import oracledb
 import json
-from utilitarios import getConnection, validar_inteiro,validar_string,validar_data
+from utilitarios import getConnection, validar_inteiro,validar_string,validar_data, validar_id
 
-'''
-1.9. ACESSO_FUNCIONALIDADE deve ser representado com as chaves: id, funcionalidade,
-quantidade_acessos e tempo_permanencia_seg, data_acesso, id_paciente
-
-verificar check_acessos_funcionalidades
-
-'''
 #Operações CRUD
 def create_acesso(id, funcionalidade, quantidade_acessos, tempo_permanencia_seg, data_acesso, id_paciente):
-    print('*** Inserindo um novo acesso na tabela CC_ACESSOS_FUNCIONALIDADE ***')
+    print('*** Inserindo um novo acesso na tabela cc_acessos_funcionalidade ***')
     conn = getConnection()
 
     #validação da conexão
@@ -21,7 +14,7 @@ def create_acesso(id, funcionalidade, quantidade_acessos, tempo_permanencia_seg,
     try:
         cursor = conn.cursor() #obter um cursor
         sql = """
-            INSERT INTO CC_ACESSOS_FUNCIONALIDADE (id, funcionalidade, quantidade_acessos, tempo_permanencia_seg, data_acesso, id_paciente)
+            INSERT INTO cc_acessos_funcionalidade (id, funcionalidade, quantidade_acessos, tempo_permanencia_seg, data_acesso, id_paciente)
             VALUES (:id, :funcionalidade, :quantidade_acessos, :tempo_permanencia_seg, :data_acesso, :id_paciente)
         """
         cursor.execute(sql, {
@@ -52,10 +45,11 @@ def read_acesso():
         cursor = conn.cursor()
         sql = """
             SELECT id, funcionalidade , quantidade_acessos, tempo_permanencia_seg, data_acesso, id_paciente 
-            FROM CC_ACESSOS_FUNCIONALIDADE ORDER BY id
+            FROM cc_acessos_funcionalidade ORDER BY id
         """
         cursor.execute(sql)
-        print("\n --- Lista de acessos ---")
+        print("""
+ --- Lista de acessos ---""")
         rows = cursor.fetchall()
         for row in rows:
             print(f'ID: {row[0]}, funcionalidade: {row[1]}, quantidade de acessos: {row[2]}, tempo de permanencia em segundos: {row[3]}, data de acesso: {row[4]} e id do paciente: {row[5]}')
@@ -80,7 +74,7 @@ def update_acesso(id, nova_funcionalidade, nova_quantidade_acessos, novo_tempo_p
         cursor = conn.cursor()
         sql = """
 
-        UPDATE CC_ACESSOS_FUNCIONALIDADE
+        UPDATE cc_acessos_funcionalidade
         set funcionalidade = :nova_funcionalidade, quantidade_acessos = :nova_quantidade_acessos, tempo_permanencia_seg = :novo_tempo_permanencia_seg, data_acesso = :nova_data_acesso, id_paciente = :novo_id_paciente WHERE id = :id
         
         """
@@ -102,7 +96,6 @@ def update_acesso(id, nova_funcionalidade, nova_quantidade_acessos, novo_tempo_p
 
 #DELETE
 #remove um acesso pelo Id
-
 def delete_acesso(id):
     print(f' Excluindo o acesso com id: {id}')
 
@@ -114,7 +107,7 @@ def delete_acesso(id):
     try:
         cursor = conn.cursor()
         sql = """
-        DELETE FROM CC_ACESSOS_FUNCIONALIDADE WHERE
+        DELETE FROM cc_acessos_funcionalidade WHERE
         id=  :id
         """
         cursor.execute(sql, {'id' : id})
@@ -149,7 +142,7 @@ def exportar_acessos_json():
         cursor = conn.cursor()
         cursor.execute("""
             SELECT id, funcionalidade , quantidade_acessos, tempo_permanencia_seg, data_acesso, id_paciente 
-            FROM CC_ACESSOS_FUNCIONALIDADE ORDER BY id
+            FROM cc_acessos_funcionalidade ORDER BY id
         """)
         rows = cursor.fetchall() 
 
@@ -170,7 +163,6 @@ def exportar_acessos_json():
     
 
 #Programa Principal
-
 def main_acesso():
 
     while True:
@@ -183,30 +175,30 @@ def main_acesso():
         print('5. Exportar acessos para Json')
         print('6. Voltar ao menu principal')
 
-        opcao=validar_inteiro('Digite uma opção: ')
+        opcao=validar_inteiro('Digite uma opção entre 1 e 6: ')
         if opcao ==1:
-            id = validar_inteiro('Digite o ID do acesso: ')
+            id = validar_id()
             funcionalidade = validar_string('Digite a Funcionalidade do acesso: ')
             quantidade_acessos = validar_inteiro('Digite a quantidade de acessos: ')
             tempo_permanencia_seg= validar_inteiro('Digite o tempo de permanencia em segundos: ')
-            data_acesso=validar_data('Digite a data de acesso: ')
-            id_paciente=validar_inteiro('Digite o id do paciente: ')
+            data_acesso=validar_data('Digite a data de acesso (DD/MM/AAAA HH:MM): ')
+            id_paciente=validar_string('Digite o id do paciente: ')
             create_acesso(id,funcionalidade,quantidade_acessos,tempo_permanencia_seg, data_acesso, id_paciente)
     
         elif opcao==2:
             read_acesso()
 
         elif opcao==3:
-            id = validar_inteiro('Digite o Id do acesso: ')
+            id = validar_string('Digite o Id do acesso que deseja atualizar: ')
             nova_funcionalidade = validar_string('Digite a nova funcionalidade do acesso: ')
             nova_quantidade_acessos = validar_inteiro('Digite a nova quantidade de acessos do acesso: ')
             novo_tempo_permanencia_seg = validar_inteiro('Digite o novo tempo de permanencia em segundos: ')
-            nova_data_acesso=validar_data('Digite a nova data de acesso: ')
-            novo_id_paciente=validar_inteiro('Digite o novo id do paciente: ')
+            nova_data_acesso=validar_data('Digite a nova data de acesso (DD/MM/AAAA HH:MM): ')
+            novo_id_paciente=validar_string('Digite o novo id do paciente: ')
             update_acesso(id,nova_funcionalidade,nova_quantidade_acessos,novo_tempo_permanencia_seg,nova_data_acesso,novo_id_paciente)
 
         elif opcao==4:
-            id = validar_inteiro('Digite o Id do acesso: ')
+            id = validar_string('Digite o Id do acesso que deseja excluir: ')
             delete_acesso(id)
             
         elif opcao == 5:
@@ -216,7 +208,7 @@ def main_acesso():
             print('Encerrando o programa... volte sempre')
             break
         else:
-            print("❌ Opção inválida. Tente novamente com um número inteiro entre 1 e 6.")
+            print("Opção inválida. Tente novamente com um número inteiro entre 1 e 6.")
 
 if __name__ == "__main__":
     main_acesso()

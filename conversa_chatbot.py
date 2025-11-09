@@ -1,32 +1,29 @@
 import oracledb
 import json
-from utilitarios import getConnection,validar_string,validar_inteiro
+from utilitarios import getConnection,validar_string,validar_inteiro, validar_id
 
-'''
-1.7. CONVERSA_CHATBOT deve ser representado com as chaves: id_conversa, pergunta e aprovacao.
-'''
 #Operações CRUD
-def create_conversa_chatbot(id_conversa, pergunta, aprovacao):
-    print('*** Inserindo uma nova conversa na tabela conversas_chatbot ***')
+def create_conversa_chatbot(id, id_paciente, pergunta, aprovacao):
+    print('*** Inserindo uma nova conversa na tabela cc_chatbot ***')
     conn = getConnection()
 
-    #validação da conexão
     if not conn:
         return
     
     try:
-        cursor = conn.cursor() #obter um cursor
+        cursor = conn.cursor()
         sql = """
-            INSERT INTO conversas_chatbot (id_conversa, pergunta, aprovacao)
-            VALUES (:id_conversa, :pergunta, :aprovacao)
+            INSERT INTO cc_chatbot (id, id_paciente, pergunta, aprovacao)
+            VALUES (:id, :id_paciente, :pergunta, :aprovacao)
         """
         cursor.execute(sql, {
-            'id_conversa' : id_conversa,
+            'id' : id,
+            'id_paciente' : id_paciente,
             'pergunta' : pergunta,
             'aprovacao' : aprovacao
         })
         conn.commit()
-        print(f' A conversa com chatbot de ID: {id_conversa} foi adicionado com sucesso!')
+        print(f' A conversa com chatbot de ID: {id} foi adicionada com sucesso!')
     except oracledb.Error as e:
         print(f'\nErro ao inserir a conversa chatbot: {e}')
         conn.rollback()
@@ -44,14 +41,14 @@ def read_conversa_chatbot():
     try:
         cursor = conn.cursor()
         sql = """
-            SELECT id_conversa, pergunta , aprovacao
-            FROM conversas_chatbot ORDER BY id_conversa
+            SELECT id, id_paciente, pergunta, aprovacao
+            FROM cc_chatbot ORDER BY id
         """
         cursor.execute(sql)
         print("\n --- Lista de conversas com chatbot ---")
         rows = cursor.fetchall()
         for row in rows:
-            print(f'ID: {row[0]}, pergunta: {row[1]}, aprovacao: {row[2]}')
+            print(f'ID: {row[0]}, ID Paciente: {row[1]}, Pergunta: {row[2]}, Aprovação: {row[3]}')
             print('----------------------------------')
     except oracledb.Error as e:
         print(f'\nErro ao ler conversas com chatbots: {e}')
@@ -62,7 +59,7 @@ def read_conversa_chatbot():
 
 #Update
 #Atualizar um dado de um conversa_chatbot
-def update_conversa_chatbot(id_conversa, nova_pergunta, nova_aprovacao):
+def update_conversa_chatbot(id, novo_id_paciente, nova_pergunta, nova_aprovacao):
     print(f'Atualizando os dados da conversa chatbot pelo ID')
 
     conn = getConnection()
@@ -72,17 +69,15 @@ def update_conversa_chatbot(id_conversa, nova_pergunta, nova_aprovacao):
     try:
         cursor = conn.cursor()
         sql = """
-
-        UPDATE conversas_chatbot
-        SET pergunta = :nova_pergunta, aprovacao = :nova_aprovacao WHERE id_conversa = :id_conversa
-        
+        UPDATE cc_chatbot
+        SET id_paciente = :novo_id_paciente, pergunta = :nova_pergunta, aprovacao = :nova_aprovacao WHERE id = :id
         """
-        cursor.execute(sql, {'nova_pergunta' : nova_pergunta, 'nova_aprovacao' : nova_aprovacao,'id_conversa': id_conversa})
+        cursor.execute(sql, {'novo_id_paciente': novo_id_paciente, 'nova_pergunta' : nova_pergunta, 'nova_aprovacao' : nova_aprovacao,'id': id})
         conn.commit()
-        if cursor.rowcount >0:
-            print(f'A nova pergunta {nova_pergunta}, nova aprovação {nova_aprovacao} da conversa: {id_conversa} foram atualizados!')
+        if cursor.rowcount > 0:
+            print(f'Os dados da conversa {id} foram atualizados!')
         else:
-            print(f'Nenhuma conversa com chatbot de ID {id_conversa} foi encontrada')
+            print(f'Nenhuma conversa com chatbot de ID {id} foi encontrada')
 
 
     except oracledb.Error as e:
@@ -95,9 +90,8 @@ def update_conversa_chatbot(id_conversa, nova_pergunta, nova_aprovacao):
 
 #DELETE
 #remove uma conversa_chatbot pelo Id
-
-def delete_conversa_chatbot(id_conversa):
-    print(f' Excluindo a conversa com chatbot de ID: {id_conversa}')
+def delete_conversa_chatbot(id):
+    print(f' Excluindo a conversa com chatbot de ID: {id}')
 
     conn = getConnection()
 
@@ -106,16 +100,13 @@ def delete_conversa_chatbot(id_conversa):
     
     try:
         cursor = conn.cursor()
-        sql = """
-        DELETE FROM conversas_chatbot WHERE 
-        id_conversa=  :id_conversa
-        """
-        cursor.execute(sql, {'id_conversa' : id_conversa})
+        sql = """DELETE FROM cc_chatbot WHERE id = :id"""
+        cursor.execute(sql, {'id' : id})
         conn.commit()
-        if cursor.rowcount >0:
-            print(f'A conversa com chatbot de ID: {id_conversa} foi excluido com sucesso!')
+        if cursor.rowcount > 0:
+            print(f'A conversa com chatbot de ID: {id} foi excluida com sucesso!')
         else:
-            print(f'Nenhuma conversa com chatbot de ID {id_conversa} foi encontrado')
+            print(f'Nenhuma conversa com chatbot de ID {id} foi encontrado')
         
     except oracledb.Error as e:
         print(f'Erro ao Excluir a conversa com chatbot: {e}')
@@ -140,13 +131,13 @@ def exportar_conversas_chatbot_json():
     try:
         cursor = conn.cursor()
         cursor.execute("""
-            SELECT id_conversa, pergunta, aprovacao
-            FROM conversas_chatbot ORDER BY id_conversa
+            SELECT id, id_paciente, pergunta, aprovacao
+            FROM cc_chatbot ORDER BY id
         """)
         rows = cursor.fetchall() 
 
         conversas = [
-            {'id_conversa': row[0], 'pergunta': row[1],'aprovacao': row[2]}
+            {'id': row[0], 'id_paciente': row[1], 'pergunta': row[2],'aprovacao': row[3]}
             for row in rows
         ]
 
@@ -160,13 +151,20 @@ def exportar_conversas_chatbot_json():
     finally:
         conn.close()
 
-#Programa Principal
+def validar_aprovacao():
+    while True:
+        aprovacao = input("Digite a aprovação (s/n): ").lower()
+        if aprovacao in ('s', 'n'):
+            return aprovacao
+        else:
+            print("Opção inválida. Por favor, digite 's' ou 'n'.")
 
+#Programa Principal
 def main_conversa_chatbot():
 
     while True:
 
-        print('**Menu - conversas com chatbot**')
+        print('\n**Menu - Conversas com Chatbot**')
         print('1. Inserir uma nova conversa com chatbot')
         print('2. Listar todas as conversas com chatbots')
         print('3. Atualizar os dados de uma conversa com chatbot')
@@ -174,25 +172,27 @@ def main_conversa_chatbot():
         print('5. Exportar Conversas para Json')
         print('6. Voltar ao menu principal')
 
-        opcao=validar_inteiro('Digite uma opção: ')
+        opcao=validar_inteiro('Digite uma opção entre 1 e 6: ')
         if opcao ==1:
-            id_conversa =validar_inteiro('Digite o ID da conversa: ')
+            id = validar_id()
+            id_paciente = validar_string("Digite o ID do paciente: ")
             pergunta = validar_string('Digite a pergunta: ')
-            aprovacao = (input('Digite a aprovação (S/N): '))
-            create_conversa_chatbot(id_conversa,pergunta,aprovacao)
+            aprovacao = validar_aprovacao()
+            create_conversa_chatbot(id, id_paciente, pergunta, aprovacao)
     
         elif opcao==2:
             read_conversa_chatbot()
 
         elif opcao==3:
-            id_conversa = validar_inteiro('Digite o Id da conversa com chatbot: ')
+            id = validar_string('Digite o Id da conversa com chatbot: ')
+            novo_id_paciente = validar_string("Digite o novo ID do paciente: ")
             nova_pergunta = validar_string('Digite a nova pergunta da conversa com chatbot: ')
-            nova_aprovacao = (input('Digite o nova aprovação da conversa com chatbot (S/N): '))
-            update_conversa_chatbot(id_conversa,nova_pergunta,nova_aprovacao)
+            nova_aprovacao = validar_aprovacao()
+            update_conversa_chatbot(id, novo_id_paciente, nova_pergunta, nova_aprovacao)
 
         elif opcao==4:
-            id_conversa = validar_inteiro('Digite o Id da conversa com chatbot: ')
-            delete_conversa_chatbot(id_conversa)
+            id = validar_string('Digite o Id da conversa com chatbot que deseja excluir: ')
+            delete_conversa_chatbot(id)
 
         elif opcao == 5:
             exportar_conversas_chatbot_json()
@@ -201,7 +201,7 @@ def main_conversa_chatbot():
             print('Encerrando o programa... volte sempre')
             break
         else:
-            print("❌ Opção inválida. Tente novamente com um número inteiro entre 1 e 6.")
+            print("Opção inválida. Tente novamente com um número inteiro entre 1 e 6.")
 
 if __name__ == "__main__":
     main_conversa_chatbot()

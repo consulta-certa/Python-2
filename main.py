@@ -61,7 +61,7 @@ def main():
             print("\n👋 Encerrando o sistema... até logo!")
             break
         else:
-            print("\n❌ Opção inválida. Tente novamente com um número inteiro entre 0 e 9.")
+            print("\nOpção inválida. Tente novamente com um número inteiro entre 0 e 9.")
 
 
 if __name__ == "__main__":

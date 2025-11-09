@@ -1,29 +1,23 @@
 import oracledb
 import json
-from utilitarios import getConnection,validar_inteiro,validar_string,validar_data
+from utilitarios import getConnection,validar_inteiro,validar_string,validar_data, validar_id, validar_tipo
 
-'''
-1.8. CONTEUDO deve ser representado com as chaves: id_conteudo, tipo, titulo, texto, video,
-imagem, data_publicacao
-
-'''
 #Operações CRUD
-def create_conteudo(id_conteudo, tipo, titulo, texto, video, imagem, data_publicacao):
-    print('*** Inserindo um novo conteudo na tabela conteudos ***')
+def create_conteudo(id, tipo, titulo, texto, video, imagem, data_publicacao):
+    print('*** Inserindo um novo conteúdo na tabela cc_conteudos ***')
     conn = getConnection()
 
-    #validação da conexão
     if not conn:
         return
     
     try:
-        cursor = conn.cursor() #obter um cursor
+        cursor = conn.cursor()
         sql = """
-            INSERT INTO conteudos (id_conteudo, tipo, titulo, texto, video, imagem, data_publicacao)
-            VALUES (:id_conteudo, :tipo, :titulo, :texto, :video, :imagem, :data_publicacao)
+            INSERT INTO cc_conteudos (id, tipo, titulo, texto, video, imagem, data_publicacao)
+            VALUES (:id, :tipo, :titulo, :texto, :video, :imagem, :data_publicacao)
         """
         cursor.execute(sql, {
-            'id_conteudo' : id_conteudo,
+            'id' : id,
             'tipo' : tipo,
             'titulo' : titulo,
             'texto' : texto,
@@ -32,9 +26,9 @@ def create_conteudo(id_conteudo, tipo, titulo, texto, video, imagem, data_public
             'data_publicacao' : data_publicacao
         })
         conn.commit()
-        print(f' O conteudo de ID: {id_conteudo}, TIPO: {tipo}, TITULO: {titulo}, TEXTO: {texto}, VIDEO: {video}, IMAGEM: {imagem} e Data de publicacao: {data_publicacao} foi adicionado com sucesso!')
+        print(f' O conteúdo de ID: {id}, Título: {titulo} foi adicionado com sucesso!')
     except oracledb.Error as e:
-        print(f'\nErro ao inserir conteudo: {e}')
+        print(f'\nErro ao inserir conteúdo: {e}')
         conn.rollback()
     finally:
         if conn:
@@ -42,7 +36,7 @@ def create_conteudo(id_conteudo, tipo, titulo, texto, video, imagem, data_public
 
 #Exibir os dados de todos os conteudos
 def read_conteudo():
-    print('*** Lê e exibe todos os conteudos da tabela ***')
+    print('*** Lê e exibe todos os conteúdos da tabela ***')
     conn = getConnection()
     if not conn:
         return
@@ -50,17 +44,17 @@ def read_conteudo():
     try:
         cursor = conn.cursor()
         sql = """
-            SELECT id_conteudo, tipo , titulo, texto, video, imagem, data_publicacao
-            FROM conteudos ORDER BY id_conteudo
+            SELECT id, tipo , titulo, texto, video, imagem, data_publicacao
+            FROM cc_conteudos ORDER BY data_publicacao DESC
         """
         cursor.execute(sql)
-        print("\n --- Lista de conteudos ---")
+        print("\n --- Lista de conteúdos ---")
         rows = cursor.fetchall()
         for row in rows:
-            print(f'ID: {row[0]}, tipo: {row[1]}, titulo: {row[2]}, texto: {row[3]}, video: {row[4]}, imagem: {row[5]}, data_publicacao: {row[6]}')
+            print(f'ID: {row[0]}, Tipo: {row[1]}, Título: {row[2]}, Data: {row[6].strftime("%d/%m/%Y")}\nTexto: {row[3]}\nVideo: {row[4]}\nImagem: {row[5]}')
             print('----------------------------------')
     except oracledb.Error as e:
-        print(f'\nErro ao ler conteudos: {e}')
+        print(f'\nErro ao ler conteúdos: {e}')
     finally:
         if conn:
             conn.close()
@@ -68,8 +62,8 @@ def read_conteudo():
 
 #Update
 #Atualizar um dado de um conteudo
-def update_conteudo(id_conteudo, novo_tipo, novo_titulo, novo_texto, novo_video, nova_imagem, nova_publicacao):
-    print(f'Atualizando os dados do conteudo pelo ID')
+def update_conteudo(id, novo_tipo, novo_titulo, novo_texto, novo_video, nova_imagem, nova_data_publicacao):
+    print(f'Atualizando os dados do conteúdo pelo ID')
 
     conn = getConnection()
     if not conn:
@@ -78,17 +72,15 @@ def update_conteudo(id_conteudo, novo_tipo, novo_titulo, novo_texto, novo_video,
     try:
         cursor = conn.cursor()
         sql = """
-
-        UPDATE conteudos
-        set tipo = :novo_tipo, titulo = :novo_titulo, texto = :novo_texto, video = :novo_video, imagem = :nova_imagem, data_publicacao = :nova_publicacao WHERE id_conteudo = :id_conteudo
-        
+        UPDATE cc_conteudos
+        SET tipo = :novo_tipo, titulo = :novo_titulo, texto = :novo_texto, video = :novo_video, imagem = :nova_imagem, data_publicacao = :nova_data_publicacao WHERE id = :id
         """
-        cursor.execute(sql, {'novo_tipo' : novo_tipo, 'novo_titulo' : novo_titulo, 'novo_texto' :novo_texto, 'novo_video' : novo_video, 'nova_imagem' : nova_imagem, 'nova_publicacao' : nova_publicacao, 'id_conteudo': id_conteudo})
+        cursor.execute(sql, {'novo_tipo' : novo_tipo, 'novo_titulo' : novo_titulo, 'novo_texto' :novo_texto, 'novo_video' : novo_video, 'nova_imagem' : nova_imagem, 'nova_data_publicacao' : nova_data_publicacao, 'id': id})
         conn.commit()
-        if cursor.rowcount >0:
-            print(f'O novo tipo: {novo_tipo}, titulo: {novo_titulo}, texto: {novo_texto}, video: {novo_video}, imagem: {nova_imagem} e data de publicacao: {nova_publicacao} do conteudo de ID: {id_conteudo} foram atualizados!')
+        if cursor.rowcount > 0:
+            print(f'O conteúdo de ID {id} foi atualizado com sucesso!')
         else:
-            print(f'Nenhum conteudo com ID {id_conteudo} foi encontrado')
+            print(f'Nenhum conteúdo com ID {id} foi encontrado')
 
 
     except oracledb.Error as e:
@@ -101,9 +93,8 @@ def update_conteudo(id_conteudo, novo_tipo, novo_titulo, novo_texto, novo_video,
 
 #DELETE
 #remove um conteudo pelo Id
-
-def delete_conteudo(id_conteudo):
-    print(f' Excluindo o conteudo com id: {id_conteudo}')
+def delete_conteudo(id):
+    print(f' Excluindo o conteúdo com id: {id}')
 
     conn = getConnection()
 
@@ -112,19 +103,16 @@ def delete_conteudo(id_conteudo):
     
     try:
         cursor = conn.cursor()
-        sql = """
-        DELETE FROM conteudos WHERE 
-        id_conteudo=  :id_conteudo
-        """
-        cursor.execute(sql, {'id_conteudo' : id_conteudo})
+        sql = """DELETE FROM cc_conteudos WHERE id = :id"""
+        cursor.execute(sql, {'id' : id})
         conn.commit()
-        if cursor.rowcount >0:
-            print(f'O conteudo de ID: {id_conteudo} foi excluido com sucesso!')
+        if cursor.rowcount > 0:
+            print(f'O conteúdo de ID: {id} foi excluido com sucesso!')
         else:
-            print(f'Nenhum conteudo com ID {id_conteudo} foi encontrado')
+            print(f'Nenhum conteúdo com ID {id} foi encontrado')
         
     except oracledb.Error as e:
-        print(f'Erro ao Excluir conteudo: {e}')
+        print(f'Erro ao Excluir conteúdo: {e}')
         conn.rollback()
         
     finally:
@@ -133,10 +121,10 @@ def delete_conteudo(id_conteudo):
 
 def exportar_conteudos_json():
     '''
-    Exporta todos os conteudos cadastrados no banco Oracle
+    Exporta todos os conteúdos cadastrados no banco Oracle
     para um arquivo local 'conteudos.json'.
     '''
-    print('\n📤 Exportando dados dos conteudos para JSON...')
+    print('\n📤 Exportando dados dos conteúdos para JSON...')
 
     conn = getConnection()
     if not conn:
@@ -146,13 +134,13 @@ def exportar_conteudos_json():
     try:
         cursor = conn.cursor()
         cursor.execute("""
-            SELECT id_conteudo, tipo, titulo, texto, video, imagem, data_publicacao
-            FROM conteudos ORDER BY id_conteudo
+            SELECT id, tipo, titulo, texto, video, imagem, TO_CHAR(data_publicacao, 'DD/MM/YYYY') as data_formatada
+            FROM cc_conteudos ORDER BY data_publicacao DESC
         """)
-        rows = cursor.fetchall() 
+        rows = cursor.fetchall()
 
         conteudos = [
-            {'id_conteudo': row[0], 'tipo': row[1],'titulo': row[2],'texto': row[3], 'video': row[4], 'imagem': row[5], 'data_publicacao': row[6]}
+            {'id': row[0], 'tipo': row[1],'titulo': row[2],'texto': row[3], 'video': row[4], 'imagem': row[5], 'data_publicacao': row[6]}
             for row in rows
         ]
 
@@ -168,12 +156,11 @@ def exportar_conteudos_json():
     
 
 #Programa Principal
-
 def main_conteudo():
 
     while True:
 
-        print('**Menu - conteúdo**')
+        print('\n**Menu - Conteúdo**')
         print('1. Inserir um novo conteúdo')
         print('2. Listar todos os conteúdos')
         print('3. Atualizar os dados de um conteúdo')
@@ -181,34 +168,34 @@ def main_conteudo():
         print('5. Exportar Conteúdos para Json')
         print('6. Voltar ao menu principal')
 
-        opcao=validar_inteiro('Digite uma opção: ')
+        opcao=validar_inteiro('Digite uma opção entre 1 e 6: ')
         if opcao ==1:
-            id_conteudo = validar_inteiro('Digite o ID do conteúdo: ')
-            tipo = validar_string('Digite o tipo do conteúdo entre entre FAQ, Portal ou Teleconsulta(f/p/t): ') 
+            id = validar_id()
+            tipo = validar_tipo('Digite o tipo do conteúdo (f/p/t/i): ') 
             titulo = validar_string('Digite o titulo do conteúdo: ')
-            texto= validar_string('Digite o texto: ')
+            texto = validar_string('Digite o texto: ')
             video = validar_string('Digite a URL do video: ')
-            imagem = validar_string('URL da imagem: ')
-            data_publicacao = validar_data('Digite a data de publicação do conteúdo: ')
+            imagem = validar_string('Digite a URL da imagem: ')
+            data_publicacao = validar_data('Digite a data de publicação (DD/MM/AAAA HH:MM): ')
             
-            create_conteudo(id_conteudo,tipo,titulo,texto,video,imagem,data_publicacao)
+            create_conteudo(id, tipo, titulo, texto, video, imagem, data_publicacao)
     
         elif opcao==2:
             read_conteudo()
 
         elif opcao==3:
-            id_conteudo = validar_inteiro('Digite o Id do conteúdo: ')
-            novo_tipo = validar_string('Digite o novo tipo do conteúdo entre FAQ, Portal ou Teleconsulta(f/p/t): ')
+            id = validar_string('Digite o Id do conteúdo que deseja atualizar: ')
+            novo_tipo = validar_tipo('Digite o novo tipo do conteúdo (f/p/t/i): ')
             novo_titulo = validar_string('Digite o novo titulo do conteúdo: ')
             novo_texto = validar_string('Digite o novo texto: ')
             novo_video = validar_string('Digite a nova URL do video: ')
-            nova_imagem = validar_string('Digite a nova Url da imagem: ')
-            nova_publicacao = validar_data('Digite a nova data de publicação do conteúdo: ')
-            update_conteudo(id_conteudo,novo_tipo,novo_titulo,novo_texto,novo_video,nova_imagem,nova_publicacao)
+            nova_imagem = validar_string('Digite a nova URL da imagem: ')
+            nova_data_publicacao = validar_data('Digite a nova data de publicação (DD/MM/AAAA HH:MM): ')
+            update_conteudo(id, novo_tipo, novo_titulo, novo_texto, novo_video, nova_imagem, nova_data_publicacao)
 
         elif opcao==4:
-            id_conteudo = validar_inteiro('Digite o Id do conteudo: ')
-            delete_conteudo(id_conteudo)
+            id = validar_string('Digite o Id do conteudo que deseja excluir: ')
+            delete_conteudo(id)
 
         elif opcao == 5:
             exportar_conteudos_json()
@@ -217,7 +204,7 @@ def main_conteudo():
             print('Encerrando o programa... volte sempre')
             break
         else:
-            print("❌ Opção inválida. Tente novamente com um número inteiro entre 1 e 6.")
+            print("Opção inválida. Tente novamente com um número inteiro entre 1 e 6.")
 
 if __name__ == "__main__":
     main_conteudo()

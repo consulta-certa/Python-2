@@ -1,37 +1,32 @@
 import oracledb
 import json
-from utilitarios import getConnection,validar_inteiro,validar_string,validar_nome,validar_email,validar_telefone
+from utilitarios import getConnection,validar_inteiro,validar_string,validar_nome,validar_email,validar_telefone, validar_id
 
 
-'''
-1.2. Cada ACOMPANHANTE deve ser representado com as chaves: id_acompanhante,
-email, telefone, parentesco e nome e id_paciente?
-'''
 #Operações CRUD
-def create_acompanhante(id_acompanhante, email, telefone, parentesco, id_paciente, nome):
-    print('*** Inserindo um novo acompanhante na tabela acompanhante ***')
+def create_acompanhante(id, nome, email, telefone, parentesco, id_paciente):
+    print('*** Inserindo um novo acompanhante na tabela cc_acompanhantes ***')
     conn = getConnection()
 
-    #validação da conexão
     if not conn:
         return
     
     try:
-        cursor = conn.cursor() #obter um cursor
+        cursor = conn.cursor()
         sql = """
-            INSERT INTO acompanhantes (id_acompanhante, email, telefone, parentesco, id_paciente, nome)
-            VALUES (:id_acompanhante, :email, :telefone, :parentesco, :id_paciente, :nome)
+            INSERT INTO cc_acompanhantes (id, nome, email, telefone, parentesco, id_paciente)
+            VALUES (:id, :nome, :email, :telefone, :parentesco, :id_paciente)
         """
         cursor.execute(sql, {
-            'id_acompanhante' : id_acompanhante,
+            'id' : id,
+            'nome' : nome,
             'email' : email,
             'telefone' : telefone,
             'parentesco' : parentesco,
-            'id_paciente' : id_paciente,
-            'nome' : nome
+            'id_paciente' : id_paciente
         })
         conn.commit()
-        print(f' O acompanhante de ID: {id_acompanhante}, nome: {nome} email: {email}, telefone: {telefone}, grau de parentesco: {parentesco} do paciente de id{id_paciente}foi adicionado com sucesso!')
+        print(f' O acompanhante de ID: {id}, nome: {nome}, email: {email}, telefone: {telefone}, grau de parentesco: {parentesco} do paciente de id {id_paciente} foi adicionado com sucesso!')
     except oracledb.Error as e:
         print(f'\nErro ao inserir acompanhante: {e}')
         conn.rollback()
@@ -49,14 +44,14 @@ def read_acompanhante():
     try:
         cursor = conn.cursor()
         sql = """
-            SELECT id_acompanhante, email , telefone, parentesco, id_paciente, nome
-            FROM acompanhantes ORDER BY id_acompanhante
+            SELECT id, nome, email , telefone, parentesco, id_paciente
+            FROM cc_acompanhantes ORDER BY nome
         """
         cursor.execute(sql)
         print("\n --- Lista de acompanhantes ---")
         rows = cursor.fetchall()
         for row in rows:
-            print(f'ID acompanhante: {row[0]}, email: {row[1]}, telefone: {row[2]}, grau de parentesco: {row[3]}, ID do paciente: {row[4]} e nome: {row[5]}')
+            print(f'ID: {row[0]}, Nome: {row[1]}, Email: {row[2]}, Telefone: {row[3]}, Parentesco: {row[4]}, ID do Paciente: {row[5]}')
             print('----------------------------------')
     except oracledb.Error as e:
         print(f'\nErro ao ler acompanhantes: {e}')
@@ -67,7 +62,7 @@ def read_acompanhante():
 
 #Update
 #Atualizar um dado de um acompanhante
-def update_acompanhante(id_acompanhante, novo_email, novo_telefone, novo_parentesco, novo_id_paciente, novo_nome):
+def update_acompanhante(id, novo_nome, novo_email, novo_telefone, novo_parentesco, novo_id_paciente):
     print(f'Atualizando os dados do acompanhante pelo ID')
 
     conn = getConnection()
@@ -77,17 +72,15 @@ def update_acompanhante(id_acompanhante, novo_email, novo_telefone, novo_parente
     try:
         cursor = conn.cursor()
         sql = """
-
-        UPDATE acompanhantes
-        SET email = :novo_email, telefone = :novo_telefone, parentesco = :novo_parentesco, id_paciente = :novo_id_paciente, nome = :novo_nome WHERE id_acompanhante = :id_acompanhante
-        
+        UPDATE cc_acompanhantes
+        SET nome = :novo_nome, email = :novo_email, telefone = :novo_telefone, parentesco = :novo_parentesco, id_paciente = :novo_id_paciente WHERE id = :id
         """
-        cursor.execute(sql, {'novo_email' : novo_email, 'novo_telefone' : novo_telefone, 'novo_parentesco' :novo_parentesco, 'novo_id_paciente' : novo_id_paciente,'novo_nome' : novo_nome, 'id_acompanhante': id_acompanhante})
+        cursor.execute(sql, {'novo_nome' : novo_nome, 'novo_email' : novo_email, 'novo_telefone' : novo_telefone, 'novo_parentesco' :novo_parentesco, 'novo_id_paciente' : novo_id_paciente, 'id': id})
         conn.commit()
-        if cursor.rowcount >0:
-            print(f'O novo email: {novo_email}, telefone: {novo_telefone} e grau parentesco: {novo_parentesco}, relacionado com o paciente ID: {novo_id_paciente} e nome: {novo_nome} do acompanhante de ID:{id_acompanhante} foram atualizados!')
+        if cursor.rowcount > 0:
+            print(f'Os dados do acompanhante de ID {id} foram atualizados!')
         else:
-            print(f'Nenhum acompanhante com ID {id_acompanhante} foi encontrado')
+            print(f'Nenhum acompanhante com ID {id} foi encontrado')
 
 
     except oracledb.Error as e:
@@ -100,9 +93,8 @@ def update_acompanhante(id_acompanhante, novo_email, novo_telefone, novo_parente
 
 #DELETE
 #remove um acompanhante pelo Id
-
-def delete_acompanhante(id_acompanhante):
-    print(f' Excluindo o acompanhante com id: {id_acompanhante}')
+def delete_acompanhante(id):
+    print(f' Excluindo o acompanhante com id: {id}')
 
     conn = getConnection()
 
@@ -111,16 +103,13 @@ def delete_acompanhante(id_acompanhante):
     
     try:
         cursor = conn.cursor()
-        sql = """
-        DELETE FROM acompanhantes WHERE 
-        id_acompanhante=  :id_acompanhante
-        """
-        cursor.execute(sql, {'id_acompanhante' : id_acompanhante})
+        sql = """DELETE FROM cc_acompanhantes WHERE id = :id"""
+        cursor.execute(sql, {'id' : id})
         conn.commit()
-        if cursor.rowcount >0:
-            print(f'O acompanhante de ID: {id_acompanhante} foi excluido com sucesso!')
+        if cursor.rowcount > 0:
+            print(f'O acompanhante de ID: {id} foi excluido com sucesso!')
         else:
-            print(f'Nenhum acompanhante com ID {id_acompanhante} foi encontrado')
+            print(f'Nenhum acompanhante com ID {id} foi encontrado')
         
     except oracledb.Error as e:
         print(f'Erro ao Excluir acompanhante: {e}')
@@ -146,13 +135,13 @@ def exportar_acompanhantes_json():
     try:
         cursor = conn.cursor()
         cursor.execute("""
-            SELECT id_acompanhante, email , telefone, parentesco, id_paciente, nome
-            FROM acompanhantes ORDER BY id_acompanhante
+            SELECT id, nome, email , telefone, parentesco, id_paciente
+            FROM cc_acompanhantes ORDER BY nome
         """)
-        rows = cursor.fetchall() 
+        rows = cursor.fetchall()
 
         acompanhantes = [
-            {'id_acompanhante': row[0], 'email': row[1],'telefone': row[2],'parentesco': row[3], 'id_paciente': row[4], 'nome' : row[5]}
+            {'id': row[0], 'nome': row[1], 'email': row[2],'telefone': row[3],'parentesco': row[4], 'id_paciente': row[5]}
             for row in rows
         ]
 
@@ -167,12 +156,11 @@ def exportar_acompanhantes_json():
         conn.close()
 
 #Programa Principal
-
 def main_acompanhante():
 
     while True:
 
-        print('**Menu - acompanhante**')
+        print('\n**Menu - Acompanhante**')
         print('1. Inserir um novo acompanhante')
         print('2. Listar todos os acompanhantes')
         print('3. Atualizar os dados de um acompanhante')
@@ -180,31 +168,31 @@ def main_acompanhante():
         print('5. Exportar Acompanhantes para Json')
         print('6. Voltar ao menu principal')
 
-        opcao=validar_inteiro('Digite uma opção: ')
+        opcao=validar_inteiro('Digite uma opção entre 1 e 6: ')
         if opcao ==1:
-            id_acompanhante = validar_inteiro('Digite o ID do acompanhante: ')
+            id = validar_id()
+            nome = validar_nome('Digite o nome do acompanhante: ')
             email = validar_email('Digite o email do acompanhante: ')
             telefone = validar_telefone('Digite o telefone do acompanhante: ')
             parentesco = validar_string('Digite o grau de parentesco do acompanhante: ')
-            id_paciente = validar_inteiro('Digite o ID do paciente relacionado: ')
-            nome = validar_nome('Digite o nome do acompanhante: ')
-            create_acompanhante(id_acompanhante,email,telefone,parentesco,id_paciente,nome)
+            id_paciente = validar_string('Digite o ID do paciente relacionado: ')
+            create_acompanhante(id, nome, email, telefone, parentesco, id_paciente)
     
         elif opcao==2:
             read_acompanhante()
 
         elif opcao==3:
-            id_acompanhante = validar_inteiro('Digite o Id do acompanhante: ')
+            id = validar_string('Digite o Id do acompanhante que deseja atualizar: ')
+            novo_nome = validar_nome('Digite o novo nome do acompanhante: ')
             novo_email = validar_email('Digite o novo email do acompanhante: ')
             novo_telefone = validar_telefone('Digite o novo telefone do acompanhante: ')
             novo_parentesco = validar_string('Digite o novo grau de parentesco do acompanhante: ')
-            novo_id_paciente = validar_inteiro('Digite o novo ID do paciente relacionado: ')
-            novo_nome = validar_nome('Digite o novo nome do acompanhante: ')
-            update_acompanhante(id_acompanhante,novo_email,novo_telefone,novo_parentesco,novo_id_paciente,novo_nome)
+            novo_id_paciente = validar_string('Digite o novo ID do paciente relacionado: ')
+            update_acompanhante(id, novo_nome, novo_email, novo_telefone, novo_parentesco, novo_id_paciente)
 
         elif opcao==4:
-            id_acompanhante = validar_inteiro('Digite o Id do acompanhante: ')
-            delete_acompanhante(id_acompanhante)
+            id = validar_string('Digite o Id do acompanhante que deseja excluir: ')
+            delete_acompanhante(id)
     
         elif opcao == 5:
             exportar_acompanhantes_json()
@@ -213,7 +201,7 @@ def main_acompanhante():
             print('Encerrando o programa... volte sempre')
             break
         else:
-            print("❌ Opção inválida. Tente novamente com um número inteiro entre 1 e 6.")
+            print("Opção inválida. Tente novamente com um número inteiro entre 1 e 6.")
 
 if __name__ == "__main__":
     main_acompanhante()

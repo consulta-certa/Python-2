@@ -1,39 +1,30 @@
 import oracledb
 import json
-from utilitarios import getConnection,validar_string,validar_inteiro,validar_data
-
-
-'''
-
-1.3. CONSULTAS devem ser representadas com as chaves: id_consulta, especialidade,
-data_consulta Localdatetime, status e id_paciente.
-
-'''
+from utilitarios import getConnection,validar_string,validar_inteiro,validar_data, validar_id
 
 #Operações CRUD
-def create_consulta(id_consulta, especialidade, data_consulta, status, id_paciente):
-    print('*** Inserindo uma nova Consulta na tabela Consultas ***')
+def create_consulta(id, especialidade, data_consulta, ativa, id_paciente):
+    print('*** Inserindo uma nova Consulta na tabela cc_consultas ***')
     conn = getConnection()
 
-    #validação da conexão
     if not conn:
         return
     
     try:
-        cursor = conn.cursor() #obter um cursor
+        cursor = conn.cursor()
         sql = """
-            INSERT INTO consultas (id_consulta, especialidade, data_consulta, status, id_paciente)
-            VALUES (:id_consulta, :especialidade, :data_consulta, :status, :id_paciente)
+            INSERT INTO cc_consultas (id, especialidade, data_consulta, ativa, id_paciente)
+            VALUES (:id, :especialidade, :data_consulta, :ativa, :id_paciente)
         """
         cursor.execute(sql, {
-            'id_consulta' : id_consulta,
+            'id' : id,
             'especialidade' : especialidade,
             'data_consulta' : data_consulta,
-            'status' : status,
+            'ativa' : ativa,
             'id_paciente' : id_paciente
         })
         conn.commit()
-        print(f'A Consulta {id_consulta} de especialidade {especialidade} foi adicionada com sucesso!')
+        print(f'A Consulta {id} de especialidade {especialidade} foi adicionada com sucesso!')
     except oracledb.Error as e:
         print(f'\nErro ao inserior Consulta: {e}')
         conn.rollback()
@@ -51,17 +42,17 @@ def read_consulta():
     try:
         cursor = conn.cursor()
         sql = """
-            SELECT id_consulta, especialidade , data_consulta, status, id_paciente
-            FROM consultas ORDER BY id_consulta
+            SELECT id, especialidade , data_consulta, ativa, id_paciente
+            FROM cc_consultas ORDER BY data_consulta DESC
         """
         cursor.execute(sql)
         print("\n --- Lista de Consultas ---")
         rows = cursor.fetchall()
         for row in rows:
-            print(f'ID da consulta: {row[0]}, especialidade: {row[1]}, data da consulta: {row[2]}, status: {row[3]} e id do paciente relacionado: {row[4]}')
+            print(f'ID: {row[0]}, Especialidade: {row[1]}, Data: {row[2].strftime("%d/%m/%Y %H:%M")}, Ativa: {row[3]}, ID Paciente: {row[4]}')
             print('----------------------------------')
     except oracledb.Error as e:
-        print(f'\nErro ao ler Pacientes: {e}')
+        print(f'\nErro ao ler Consultas: {e}')
     finally:
         if conn:
             conn.close()
@@ -69,7 +60,7 @@ def read_consulta():
 
 #Update
 #Atualizar um dado de uma Consulta
-def update_consulta(id_consulta, nova_especialidade, nova_data_consulta, novo_status, novo_paciente):
+def update_consulta(id, nova_especialidade, nova_data_consulta, nova_ativa, novo_id_paciente):
     print(f'Atualizando os dados da Consulta pelo ID')
 
     conn = getConnection()
@@ -79,18 +70,16 @@ def update_consulta(id_consulta, nova_especialidade, nova_data_consulta, novo_st
     try:
         cursor = conn.cursor()
         sql = """
-
-        UPDATE consultas
-        set especialidade = :nova_especialidade, data_consulta = :nova_data_consulta, status = :novo_status, 
-        id_paciente = :novo_paciente WHERE id_consulta = :id_consulta
-        
+        UPDATE cc_consultas
+        SET especialidade = :nova_especialidade, data_consulta = :nova_data_consulta, ativa = :nova_ativa, id_paciente = :novo_id_paciente 
+        WHERE id = :id
         """
-        cursor.execute(sql, {'nova_especialidade' : nova_especialidade, 'nova_data_consulta' : nova_data_consulta, 'novo_status' :novo_status, 'novo_paciente' : novo_paciente, 'id_consulta': id_consulta})
+        cursor.execute(sql, {'nova_especialidade' : nova_especialidade, 'nova_data_consulta' : nova_data_consulta, 'nova_ativa' :nova_ativa, 'novo_id_paciente' : novo_id_paciente, 'id': id})
         conn.commit()
         if cursor.rowcount >0:
-            print(f' A nova especialidade {nova_especialidade}, data_consulta{nova_data_consulta} e status{novo_status} do Paciente{id_consulta} foram atualizados!')
+            print(f' Os dados da consulta de ID {id} foram atualizados!')
         else:
-            print(f'Nenhuma Consulta com ID {id_consulta} foi encontrada')
+            print(f'Nenhuma Consulta com ID {id} foi encontrada')
 
 
     except oracledb.Error as e:
@@ -103,9 +92,8 @@ def update_consulta(id_consulta, nova_especialidade, nova_data_consulta, novo_st
 
 #DELETE
 #remove uma consulta pelo Id
-
-def delete_consulta(id_consulta):
-    print(f' Excluindo a Consulta com id: {id_consulta}')
+def delete_consulta(id):
+    print(f' Excluindo a Consulta com id: {id}')
 
     conn = getConnection()
 
@@ -114,16 +102,13 @@ def delete_consulta(id_consulta):
     
     try:
         cursor = conn.cursor()
-        sql = """
-        DELETE FROM consultas WHERE 
-        id_consulta=  :id_consulta
-        """
-        cursor.execute(sql, {'id_consulta' : id_consulta})
+        sql = """DELETE FROM cc_consultas WHERE id = :id"""
+        cursor.execute(sql, {'id' : id})
         conn.commit()
         if cursor.rowcount >0:
-            print(f'A consulta {id_consulta} foi excluida com sucesso!')
+            print(f'A consulta {id} foi excluida com sucesso!')
         else:
-            print(f'Nenhuma Consulta com ID {id_consulta} foi encontrada')
+            print(f'Nenhuma Consulta com ID {id} foi encontrada')
         
     except oracledb.Error as e:
         print(f'Erro ao Excluir Consulta: {e}')
@@ -148,13 +133,13 @@ def exportar_consultas_json():
     try:
         cursor = conn.cursor()
         cursor.execute("""
-            SELECT id_consulta, especialidade, data_consulta, status, id_paciente
-            FROM consultas ORDER BY id_consulta
+            SELECT id, especialidade, TO_CHAR(data_consulta, 'DD/MM/YYYY HH24:MI:SS') as data_formatada, ativa, id_paciente
+            FROM cc_consultas ORDER BY data_consulta DESC
         """)
-        rows = cursor.fetchall() 
+        rows = cursor.fetchall()
 
         consultas = [
-            {'id_consulta': row[0], 'especialidade': row[1],'data_consulta': row[2],'status': row[3], 'id_paciente': row[4]}
+            {'id': row[0], 'especialidade': row[1],'data_consulta': row[2],'ativa': row[3], 'id_paciente': row[4]}
             for row in rows
         ]
 
@@ -168,43 +153,51 @@ def exportar_consultas_json():
     finally:
         conn.close()
 
-#Programa Principal
 
+def validar_status_consulta():
+    while True:
+        status = input("Digite o status da consulta (s para ativa, n para inativa): ").lower()
+        if status in ('s', 'n'):
+            return status
+        else:
+            print("Opção inválida. Por favor, digite 's' ou 'n'.")
+
+#Programa Principal
 def main_consulta():
 
     while True:
 
-        print('**Menu - Consulta**')
-        print('1. Inserir uma nova Consulta')
+        print('\n**Menu - Consulta**')
+        print('1. Agendar uma nova Consulta')
         print('2. Listar todas as Consultas')
         print('3. Atualizar os dados de uma Consulta')
         print('4. Excluir uma Consulta')
         print('5. Exportar Consultas para Json')
         print('6. Voltar ao menu principal')
 
-        opcao=validar_inteiro('Digite uma opção: ')
+        opcao=validar_inteiro('Digite uma opção entre 1 e 6: ')
         if opcao ==1:
-            id_consulta = validar_inteiro('Digite o ID da Consulta: ')
-            especialidade = validar_string('Digite a especialidade da consulta: ')
-            data_consulta = validar_data('Digite a data da consulta: ')
-            status= (input('Digite o status (A/I): '))
-            id_paciente = validar_inteiro('Digite o ID do Paciente: ')
-            create_consulta(id_consulta,especialidade,data_consulta,status, id_paciente)
+            id = validar_id()
+            especialidade = validar_string('Digite a especialidade da consulta: ', maximo=50)
+            data_consulta = validar_data('Digite a data da consulta (DD/MM/AAAA HH:MM): ')
+            ativa = validar_status_consulta()
+            id_paciente = validar_string('Digite o ID do Paciente: ')
+            create_consulta(id, especialidade, data_consulta, ativa, id_paciente)
     
         elif opcao==2:
             read_consulta()
 
         elif opcao==3:
-            id_consulta = validar_inteiro('Digite o Id da Consulta: ')
-            novo_especialidade = validar_string('Digite a nova especialidade da Consulta: ')
-            novo_data_consulta = validar_data('Digite a nova data da Consulta: ')
-            novo_status = (input('Digite o novo status (A/I): '))
-            novo_paciente = validar_inteiro('Digite o novo Id do Paciente: ')
-            update_consulta(id_consulta,novo_especialidade,novo_data_consulta,novo_status, novo_paciente)
+            id = validar_string('Digite o Id da Consulta que deseja atualizar: ')
+            nova_especialidade = validar_string('Digite a nova especialidade da Consulta: ', maximo=50)
+            nova_data_consulta = validar_data('Digite a nova data da Consulta (DD/MM/AAAA HH:MM): ')
+            nova_ativa = validar_status_consulta()
+            novo_id_paciente = validar_string('Digite o novo Id do Paciente: ')
+            update_consulta(id, nova_especialidade, nova_data_consulta, nova_ativa, novo_id_paciente)
 
         elif opcao==4:
-            id_consulta = validar_inteiro('Digite o Id da Consulta: ')
-            delete_consulta(id_consulta)
+            id = validar_string('Digite o Id da Consulta que deseja excluir: ')
+            delete_consulta(id)
 
         elif opcao == 5:
             exportar_consultas_json()
@@ -213,7 +206,7 @@ def main_consulta():
             print('Encerrando o programa... volte sempre')
             break
         else:
-            print("❌ Opção inválida. Tente novamente com um número inteiro entre 1 e 6.")
+            print("Opção inválida. Tente novamente com um número inteiro entre 1 e 6.")
 
 if __name__ == "__main__":
     main_consulta()

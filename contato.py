@@ -1,28 +1,24 @@
 import oracledb
 import json
-from utilitarios import getConnection,validar_inteiro,validar_string,validar_nome,validar_email,validar_telefone,validar_cep
+from utilitarios import getConnection,validar_inteiro,validar_string,validar_nome,validar_email,validar_telefone,validar_cep, validar_id
 
-'''
-1.5. CONTATO deve ser representado com as chaves: id_contato, nome, telefone,
-email, numero, rua, bairro, cidade e cep.'''
 
 #Operações CRUD
-def create_contato(id_contato, nome, telefone, email, numero, rua, bairro, cidade, cep):
-    print('*** Inserindo um novo contato na tabela contatos ***')
+def create_contato(id, nome, telefone, email, numero, rua, bairro, cidade, cep, imagem):
+    print('*** Inserindo um novo contato na tabela cc_contatos_hc ***')
     conn = getConnection()
 
-    #validação da conexão
     if not conn:
         return
     
     try:
-        cursor = conn.cursor() #obter um cursor
+        cursor = conn.cursor()
         sql = """
-            INSERT INTO contatos (id_contato, nome, telefone, email, numero, rua, bairro, cidade, cep)
-            VALUES (:id_contato, :nome, :telefone, :email, :numero, :rua, :bairro, :cidade, :cep)
+            INSERT INTO cc_contatos_hc (id, nome, telefone, email, numero, rua, bairro, cidade, cep, imagem)
+            VALUES (:id, :nome, :telefone, :email, :numero, :rua, :bairro, :cidade, :cep, :imagem)
         """
         cursor.execute(sql, {
-            'id_contato' : id_contato,
+            'id' : id,
             'nome' : nome,
             'telefone' : telefone,
             'email' : email,
@@ -30,10 +26,11 @@ def create_contato(id_contato, nome, telefone, email, numero, rua, bairro, cidad
             'rua' : rua,
             'bairro' : bairro,
             'cidade' : cidade,
-            'cep' : cep
+            'cep' : cep,
+            'imagem' : imagem
         })
         conn.commit()
-        print(f' O contato de ID: {id_contato}, nome: {nome}, telefone: {telefone}, email: {email}, numero: {numero}, rua: {rua} e bairro: {bairro}, cidade: {cidade} e cep: {cep} foi adicionado com sucesso!')
+        print(f' O contato de ID: {id}, nome: {nome} foi adicionado com sucesso!')
     except oracledb.Error as e:
         print(f'\nErro ao inserir contato: {e}')
         conn.rollback()
@@ -51,14 +48,14 @@ def read_contato():
     try:
         cursor = conn.cursor()
         sql = """
-            SELECT id_contato, nome , telefone, email, numero, rua, bairro, cidade, cep
-            FROM contatos ORDER BY id_contato
+            SELECT id, nome , telefone, email, numero, rua, bairro, cidade, cep, imagem
+            FROM cc_contatos_hc ORDER BY nome
         """
         cursor.execute(sql)
         print("\n --- Lista de contatos ---")
         rows = cursor.fetchall()
         for row in rows:
-            print(f'id: {row[0]}, nome: {row[1]}, telefone: {row[2]}, email: {row[3]}, numero: {row[4]}, rua: {row[5]}, bairro: {row[6]}, cidade: {row[7]}, cep: {row[8]}')
+            print(f'ID: {row[0]}, Nome: {row[1]}, Telefone: {row[2]}, Email: {row[3]}, Endereço: {row[5]}, {row[4]} - {row[6]}, {row[7]} - CEP: {row[8]}, Imagem: {row[9]}')
             print('----------------------------------')
     except oracledb.Error as e:
         print(f'\nErro ao ler contatos: {e}')
@@ -69,7 +66,7 @@ def read_contato():
 
 #Update
 #Atualizar um dado de um contato
-def update_contato(id_contato, novo_nome, novo_telefone, novo_email, novo_numero, nova_rua, novo_bairro, nova_cidade, novo_cep):
+def update_contato(id, novo_nome, novo_telefone, novo_email, novo_numero, nova_rua, novo_bairro, nova_cidade, novo_cep, nova_imagem):
     print(f'Atualizando os dados do contato pelo ID')
 
     conn = getConnection()
@@ -79,17 +76,15 @@ def update_contato(id_contato, novo_nome, novo_telefone, novo_email, novo_numero
     try:
         cursor = conn.cursor()
         sql = """
-
-        UPDATE contatos
-        set nome = :novo_nome, telefone = :novo_telefone, email = :novo_email, numero = :novo_numero, rua = :nova_rua, bairro = :novo_bairro, cidade = :nova_cidade, cep = :novo_cep WHERE id_contato = :id_contato
-        
+        UPDATE cc_contatos_hc
+        SET nome = :novo_nome, telefone = :novo_telefone, email = :novo_email, numero = :novo_numero, rua = :nova_rua, bairro = :novo_bairro, cidade = :nova_cidade, cep = :novo_cep, imagem = :nova_imagem WHERE id = :id
         """
-        cursor.execute(sql, {'novo_nome' : novo_nome, 'novo_telefone' : novo_telefone, 'novo_email' :novo_email, 'numero' : novo_numero, 'rua' : nova_rua, 'bairro' : novo_bairro, 'cidade' : nova_cidade, 'cep' : novo_cep, 'id_contato': id_contato})
+        cursor.execute(sql, {'novo_nome' : novo_nome, 'novo_telefone' : novo_telefone, 'novo_email' :novo_email, 'novo_numero' : novo_numero, 'nova_rua' : nova_rua, 'novo_bairro' : novo_bairro, 'nova_cidade' : nova_cidade, 'novo_cep' : novo_cep, 'nova_imagem': nova_imagem, 'id': id})
         conn.commit()
-        if cursor.rowcount >0:
-            print(f'O novo nome {novo_nome}, telefone: {novo_telefone}, email: {novo_email}, numero: {novo_numero}, rua: {nova_rua}, bairro: {novo_bairro}, cidade: {nova_cidade} e cep: {novo_cep} do contato de ID:{id_contato} foram atualizados!')
+        if cursor.rowcount > 0:
+            print(f'Os dados do contato de ID {id} foram atualizados!')
         else:
-            print(f'Nenhum contato com ID {id_contato} foi encontrado')
+            print(f'Nenhum contato com ID {id} foi encontrado')
 
 
     except oracledb.Error as e:
@@ -102,9 +97,8 @@ def update_contato(id_contato, novo_nome, novo_telefone, novo_email, novo_numero
 
 #DELETE
 #remove um contato pelo Id
-
-def delete_contato(id_contato):
-    print(f' Excluindo o contato com id: {id_contato}')
+def delete_contato(id):
+    print(f' Excluindo o contato com id: {id}')
 
     conn = getConnection()
 
@@ -113,16 +107,13 @@ def delete_contato(id_contato):
     
     try:
         cursor = conn.cursor()
-        sql = """
-        DELETE FROM contatos WHERE 
-        id_contato=  :id_contato
-        """
-        cursor.execute(sql, {'id_contato' : id_contato})
+        sql = """DELETE FROM cc_contatos_hc WHERE id = :id"""
+        cursor.execute(sql, {'id' : id})
         conn.commit()
-        if cursor.rowcount >0:
-            print(f'O contato de ID: {id_contato} foi excluido com sucesso!')
+        if cursor.rowcount > 0:
+            print(f'O contato de ID: {id} foi excluido com sucesso!')
         else:
-            print(f'Nenhum contato com ID {id_contato} foi encontrado')
+            print(f'Nenhum contato com ID {id} foi encontrado')
         
     except oracledb.Error as e:
         print(f'Erro ao Excluir contato: {e}')
@@ -147,13 +138,13 @@ def exportar_contatos_json():
     try:
         cursor = conn.cursor()
         cursor.execute("""
-            SELECT id_contato, nome, telefone, email, numero, rua, bairro, cidade, cep
-            FROM contatos ORDER BY id_contato
+            SELECT id, nome, telefone, email, numero, rua, bairro, cidade, cep, imagem
+            FROM cc_contatos_hc ORDER BY nome
         """)
-        rows = cursor.fetchall() 
+        rows = cursor.fetchall()
 
         contatos = [
-            {'id_contato': row[0], 'nome': row[1],'telefone': row[2],'email': row[3], 'numero': row[4], 'rua': row[5], 'bairro': row[6], 'cidade': row[7], 'cep': row[8]}
+            {'id': row[0], 'nome': row[1],'telefone': row[2],'email': row[3], 'numero': row[4], 'rua': row[5], 'bairro': row[6], 'cidade': row[7], 'cep': row[8], 'imagem': row[9]}
             for row in rows
         ]
 
@@ -168,12 +159,11 @@ def exportar_contatos_json():
         conn.close()
 
 #Programa Principal
-
 def main_contato():
 
     while True:
 
-        print('**Menu - contato**')
+        print('\n**Menu - Contato HC**')
         print('1. Inserir um novo contato')
         print('2. Listar todos os contatos')
         print('3. Atualizar os dados de um contato')
@@ -181,37 +171,39 @@ def main_contato():
         print('5. Exportar Contatos para Json')
         print('6. Voltar ao menu principal')
 
-        opcao=validar_inteiro('Digite uma opção: ')
+        opcao=validar_inteiro('Digite uma opção entre 1 e 6: ')
         if opcao ==1:
-            id_contato = validar_inteiro('Digite o ID do contato: ')
+            id = validar_id()
             nome = validar_nome('Digite o nome do contato: ')
-            telefone = validar_telefone('Digite o o telefone do contato: ')
-            email= validar_email('Digite o email do contato: ')
-            numero=validar_inteiro('Digite o numero da residência do contato: ')
-            rua=validar_string('Digite a rua do contato: ')
-            bairro=validar_string('Digite o bairro do contato: ') 
-            cidade=validar_string('Digite a cidade do contato: ')
-            cep=validar_cep('Digite o cep do contato: ')
-            create_contato(id_contato,nome,telefone,email,numero,rua,bairro,cidade,cep)
+            telefone = validar_telefone('Digite o telefone do contato: ')
+            email = validar_email('Digite o email do contato: ')
+            numero = validar_string('Digite o número da residência: ')
+            rua = validar_string('Digite a rua: ')
+            bairro = validar_string('Digite o bairro: ')
+            cidade = validar_string('Digite a cidade: ')
+            cep = validar_cep('Digite o CEP (8 dígitos): ')
+            imagem = validar_string('Digite a URL da imagem: ')
+            create_contato(id, nome, telefone, email, numero, rua, bairro, cidade, cep, imagem)
     
         elif opcao==2:
             read_contato()
 
         elif opcao==3:
-            id_contato = validar_inteiro('Digite o Id do contato: ')
+            id = validar_string('Digite o Id do contato que deseja atualizar: ')
             novo_nome = validar_nome('Digite o novo nome do contato: ')
             novo_telefone = validar_telefone('Digite o novo telefone do contato: ')
             novo_email = validar_email('Digite o novo email do contato: ')
-            novo_numero = validar_inteiro('Digite o novo numero do contato: ')
-            nova_rua = validar_string('Digite a nova rua do contato: ')
-            novo_bairro = validar_string('Digite o novo bairro do contato: ')
-            nova_cidade = validar_string('Digite a nova cidade do contato: ')
-            novo_cep = validar_cep('Digite o novo cep do contato: ')
-            update_contato(id_contato,novo_nome,novo_telefone,novo_email,novo_numero,nova_rua,novo_bairro,nova_cidade,novo_cep)
+            novo_numero = validar_string('Digite o novo número da residência: ')
+            nova_rua = validar_string('Digite a nova rua: ')
+            novo_bairro = validar_string('Digite o novo bairro: ')
+            nova_cidade = validar_string('Digite a nova cidade: ')
+            novo_cep = validar_cep('Digite o novo CEP (8 dígitos): ')
+            nova_imagem = validar_string('Digite a nova URL da imagem: ')
+            update_contato(id, novo_nome, novo_telefone, novo_email, novo_numero, nova_rua, novo_bairro, nova_cidade, novo_cep, nova_imagem)
 
         elif opcao==4:
-            id_contato = validar_inteiro('Digite o Id do contato: ')
-            delete_contato(id_contato)
+            id = validar_string('Digite o Id do contato que deseja excluir: ')
+            delete_contato(id)
 
         elif opcao == 5:
             exportar_contatos_json()
@@ -220,7 +212,7 @@ def main_contato():
             print('Encerrando o programa... volte sempre')
             break
         else:
-            print("❌ Opção inválida. Tente novamente com um número inteiro entre 1 e 6.")
+            print("Opção inválida. Tente novamente com um número inteiro entre 1 e 6.")
 
 if __name__ == "__main__":
     main_contato()
