@@ -27,7 +27,7 @@ def read_conteudo():
         with getConnection() as conn:
             with conn.cursor() as cursor:
                 sql = """
-                    SELECT id, tipo, titulo, texto, video, imagem, TO_CHAR(data_publicacao, 'DD/MM/YYYY')
+                    SELECT id, tipo, titulo, texto, video, imagem, data_publicacao
                     FROM cc_conteudos ORDER BY data_publicacao DESC
                 """
                 cursor.execute(sql)
@@ -90,7 +90,7 @@ def exportar_conteudos_json():
 
     try:
         with open('conteudos.json', 'w', encoding='utf-8') as f:
-            json.dump(conteudos, f, ensure_ascii=False, indent=4)
+            json.dump(conteudos, f, ensure_ascii=False, indent=4, default=str)
         print('Dados exportados com sucesso para conteudos.json.')
         return True
     except IOError as e:
@@ -129,7 +129,8 @@ def main_conteudo():
                 if conteudos:
                     print("\n--- Lista de Conteúdos ---")
                     for c in conteudos:
-                        print(f"ID: {c['id']}, Tipo: {c['tipo']}, Título: {c['titulo']}, Data: {c['data_publicacao']}")
+                        data_formatada = c['data_publicacao'].strftime('%d/%m/%Y') if c['data_publicacao'] else ''
+                        print(f"ID: {c['id']}, Tipo: {c['tipo']}, Título: {c['titulo']}, Data: {data_formatada}")
                         print(f"Texto: {c['texto']}")
                         print(f"Video: {c['video']}")
                         print(f"Imagem: {c['imagem']}")

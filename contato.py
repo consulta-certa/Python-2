@@ -76,13 +76,13 @@ def delete_contato(id):
 
 def exportar_contatos_json():
     """Exporta os contatos para JSON e retorna True em caso de sucesso."""
-    print('\n📤 Exportando dados dos contatos para JSON...')
+    print('\n Exportando dados dos contatos para JSON...')
     contatos = read_contato()
     if contatos is None:
         print(' Não foi possível obter os dados para exportar.')
         return False
     if not contatos:
-        print("↪️ Nenhum contato encontrado para exportar.")
+        print(" Nenhum contato encontrado para exportar.")
         return True
 
     try:
@@ -134,7 +134,7 @@ def main_contato():
                         print(f"Imagem: {c['imagem']}")
                         print('----------------------------------')
                 else:
-                    print("↪️ Nenhum contato encontrado.")
+                    print(" Nenhum contato encontrado.")
             else:
                 print(" Erro ao listar os contatos.")
 
@@ -160,7 +160,7 @@ def main_contato():
             print('\n*** Excluindo um contato ***')
             id = validar_string('Digite o Id do contato que deseja excluir: ')
             if delete_contato(id):
-                print(f'\n O contato {id} foi excluido com sucesso!')
+                print(f'\n O contato {id} foi excluído com sucesso!')
             else:
                 print(f'\n Falha ao excluir. Nenhum contato com ID {id} foi encontrado ou ocorreu um erro.')
 

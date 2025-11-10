@@ -30,7 +30,7 @@ def read_lembrete():
                 lembretes = []
                 for row in cursor.fetchall():
                     lembretes.append({
-                        'id': row[0], 'data_envio': row[1].strftime("%d/%m/%Y %H:%M"),
+                        'id': row[0], 'data_envio': row[1],
                         'enviado': row[2], 'id_consulta': row[3]
                     })
                 return lembretes
@@ -73,18 +73,18 @@ def delete_lembrete(id):
 
 def exportar_lembretes_json():
     """Exporta os lembretes para JSON e retorna True em caso de sucesso."""
-    print('\n📤 Exportando dados dos lembretes para JSON...')
+    print('\n Exportando dados dos lembretes para JSON...')
     lembretes = read_lembrete()
     if lembretes is None:
         print(' Não foi possível obter os dados para exportar.')
         return False
     if not lembretes:
-        print("↪️ Nenhum lembrete encontrado para exportar.")
+        print(" Nenhum lembrete encontrado para exportar.")
         return True
 
     try:
         with open('lembretes.json', 'w', encoding='utf-8') as f:
-            json.dump(lembretes, f, ensure_ascii=False, indent=4)
+            json.dump(lembretes, f, ensure_ascii=False, indent=4, default=str)
         print(' Dados exportados com sucesso para lembretes.json.')
         return True
     except IOError as e:
@@ -128,10 +128,11 @@ def main_lembrete():
                 if lembretes:
                     print("\n--- Lista de Lembretes ---")
                     for l in lembretes:
-                        print(f"ID: {l['id']}, Data Envio: {l['data_envio']}, Enviado: {l['enviado']}, ID Consulta: {l['id_consulta']}")
+                        data_formatada = l['data_envio'].strftime('%d/%m/%Y %H:%M') if l['data_envio'] else ''
+                        print(f"ID: {l['id']}, Data Envio: {data_formatada}, Enviado: {l['enviado']}, ID Consulta: {l['id_consulta']}")
                         print('----------------------------------')
                 else:
-                    print("↪️ Nenhum lembrete encontrado.")
+                    print(" Nenhum lembrete encontrado.")
             else:
                 print(" Erro ao listar os lembretes.")
 

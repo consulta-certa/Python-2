@@ -26,7 +26,7 @@ def read_acesso():
     try:
         with getConnection() as conn:
             with conn.cursor() as cursor:
-                sql = "SELECT id, funcionalidade, quantidade_acessos, tempo_permanencia_seg, TO_CHAR(data_acesso, 'DD/MM/YYYY HH24:MI:SS'), id_paciente FROM cc_acessos_funcionalidade ORDER BY id"
+                sql = "SELECT id, funcionalidade, quantidade_acessos, tempo_permanencia_seg, data_acesso, id_paciente FROM cc_acessos_funcionalidade ORDER BY id"
                 cursor.execute(sql)
                 acessos = []
                 for row in cursor.fetchall():
@@ -76,18 +76,18 @@ def delete_acesso(id):
 
 def exportar_acessos_json():
     """Exporta os acessos para JSON e retorna True em caso de sucesso."""
-    print('\n📤 Exportando dados dos acessos para JSON...')
+    print('\n Exportando dados dos acessos para JSON...')
     acessos = read_acesso()
     if acessos is None:
         print(' Não foi possível obter os dados para exportar.')
         return False
     if not acessos:
-        print("↪️ Nenhum acesso encontrado para exportar.")
+        print(" Nenhum acesso encontrado para exportar.")
         return True
 
     try:
         with open('acessos.json', 'w', encoding='utf-8') as f:
-            json.dump(acessos, f, ensure_ascii=False, indent=4)
+            json.dump(acessos, f, ensure_ascii=False, indent=4, default=str)
         print(' Dados exportados com sucesso para acessos.json.')
         return True
     except IOError as e:
@@ -125,11 +125,12 @@ def main_acesso():
                 if acessos:
                     print("\n--- Lista de Acessos ---")
                     for a in acessos:
+                        data_formatada = a['data_acesso'].strftime('%d/%m/%Y %H:%M') if a['data_acesso'] else ''
                         print(f"ID: {a['id']}, Funcionalidade: {a['funcionalidade']}, Qtd. Acessos: {a['quantidade_acessos']}, "
-                              f"Permanência (s): {a['tempo_permanencia_seg']}, Data: {a['data_acesso']}, ID Paciente: {a['id_paciente']}")
+                              f"Permanência (s): {a['tempo_permanencia_seg']}, Data: {data_formatada}, ID Paciente: {a['id_paciente']}")
                         print('----------------------------------')
                 else:
-                    print("↪️ Nenhum acesso encontrado.")
+                    print(" Nenhum acesso encontrado.")
             else:
                 print(" Erro ao listar os acessos.")
 

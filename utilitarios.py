@@ -1,3 +1,4 @@
+
 import oracledb
 from datetime import datetime
 import regex
@@ -146,27 +147,6 @@ def validar_telefone(mensagem: str) -> str:
         else:
             print("Operação cancelada. Inserir um telefone válido (ex: 11987654321 ou (11) 98765-4321).")
 
-def validar_booleano(mensagem: str) -> bool:
-    """
-    Solicita uma entrada e força uma resposta booleana (True ou False).
-    Aceita 's', 'n', 'sim', 'nao', 'true', 'false' (case-insensitive).
-    Repete a solicitação até receber uma entrada válida.
-    """
-    while True:
-        entrada = input(mensagem).strip().lower() # Limpa e converte para minúsculas
-
-        # Define as respostas que significam True
-        if entrada in ('s', 'sim', 'true', '1', 'ok', 'S', 'SIM'):
-            return True
-
-        # Define as respostas que significam False
-        elif entrada in ('n', 'não', 'nao', 'false', '0', 'cancelar', 'NAO', 'NÃO'):
-            return False
-
-        # Se não for uma resposta válida, informa o erro e o loop repete
-        else:
-            print("Entrada inválida. Por favor, digite 'sim' ou 'não' (ou variações como 's'/'n').")
-
 def validar_string(mensagem: str, minimo: int = 1, maximo: int = 100) -> str:
     """
     Solicita uma string ao usuário e garante que ela não está vazia e está dentro
@@ -199,6 +179,18 @@ def validar_id():
     Gera um ID único no formato UUID4.
     """
     return str(uuid.uuid4())
+
+
+def validar_sim_nao(mensagem: str) -> str:
+    """
+    Solicita uma resposta 's' ou 'n' e a retorna.
+    """
+    while True:
+        resposta = input(mensagem).lower()
+        if resposta in ('s', 'n'):
+            return resposta
+        else:
+            print("Opção inválida. Por favor, digite 's' ou 'n'.")
 
 def validar_sexo(mensagem: str) -> str:
     """

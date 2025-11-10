@@ -75,13 +75,13 @@ def delete_acompanhante(id):
 
 def exportar_acompanhantes_json():
     """Exporta os acompanhantes para JSON e retorna True em caso de sucesso."""
-    print('\n📤 Exportando dados dos acompanhantes para JSON...')
+    print('\n Exportando dados dos acompanhantes para JSON...')
     acompanhantes = read_acompanhante()
     if acompanhantes is None:
         print(' Não foi possível obter os dados para exportar.')
         return False
     if not acompanhantes:
-        print("↪️ Nenhum acompanhante cadastrado para exportar.")
+        print(" Nenhum acompanhante cadastrado para exportar.")
         return True
 
     try:
@@ -127,7 +127,7 @@ def main_acompanhante():
                         print(f"ID: {a['id']}, Nome: {a['nome']}, Email: {a['email']}, Telefone: {a['telefone']}, Parentesco: {a['parentesco']}, ID Paciente: {a['id_paciente']}")
                         print('----------------------------------')
                 else:
-                    print("↪️ Nenhum acompanhante encontrado.")
+                    print(" Nenhum acompanhante encontrado.")
             else:
                 print(" Erro ao listar os acompanhantes.")
 
@@ -149,7 +149,7 @@ def main_acompanhante():
             print('\n*** Excluindo um acompanhante ***')
             id = validar_string('Digite o Id do acompanhante que deseja excluir: ')
             if delete_acompanhante(id):
-                print(f'\n O acompanhante {id} foi excluido com sucesso!')
+                print(f'\n O acompanhante {id} foi excluído com sucesso!')
             else:
                 print(f'\n Falha ao excluir. Nenhum acompanhante com ID {id} foi encontrado ou ocorreu um erro.')
 

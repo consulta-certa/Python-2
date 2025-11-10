@@ -1,6 +1,6 @@
 import oracledb
 import json
-from utilitarios import getConnection, validar_string, validar_inteiro, validar_data, validar_id
+from utilitarios import getConnection, validar_string, validar_inteiro, validar_data, validar_id, validar_sim_nao
 
 def create_consulta(id, especialidade, data_consulta, ativa, id_paciente):
     """Agenda uma nova consulta e retorna True em caso de sucesso."""
@@ -31,7 +31,7 @@ def read_consulta():
                 consultas = []
                 for row in cursor.fetchall():
                     consultas.append({
-                        'id': row[0], 'especialidade': row[1], 'data_consulta': row[2].strftime("%d/%m/%Y %H:%M"),
+                        'id': row[0], 'especialidade': row[1], 'data_consulta': row[2],
                         'ativa': row[3], 'id_paciente': row[4]
                     })
                 return consultas
@@ -75,31 +75,23 @@ def delete_consulta(id):
 
 def exportar_consultas_json():
     """Exporta as consultas para JSON e retorna True em caso de sucesso."""
-    print('\n📤 Exportando dados das consultas para JSON...')
+    print('\n Exportando dados das consultas para JSON...')
     consultas = read_consulta()
     if consultas is None:
         print(' Não foi possível obter os dados para exportar.')
         return False
     if not consultas:
-        print("↪️ Nenhuma consulta encontrada para exportar.")
+        print(" Nenhuma consulta encontrada para exportar.")
         return True
 
     try:
         with open('consultas.json', 'w', encoding='utf-8') as f:
-            json.dump(consultas, f, ensure_ascii=False, indent=4)
+            json.dump(consultas, f, ensure_ascii=False, indent=4, default=str)
         print(' Dados exportados com sucesso para consultas.json.')
         return True
     except IOError as e:
         print(f' Erro ao escrever o arquivo JSON: {e}')
         return False
-
-def validar_status_consulta():
-    while True:
-        status = input("Digite o status da consulta (s para ativa, n para inativa): ").lower()
-        if status in ('s', 'n'):
-            return status
-        else:
-            print("Opção inválida. Por favor, digite 's' ou 'n'.")
 
 def main_consulta():
     while True:
@@ -117,7 +109,7 @@ def main_consulta():
             id = validar_id()
             especialidade = validar_string('Digite a especialidade da consulta: ')
             data_consulta = validar_data('Digite a data da consulta (DD/MM/AAAA HH:MM): ')
-            ativa = validar_status_consulta()
+            ativa = validar_sim_nao("Digite o status da consulta (s para ativa, n para inativa): ")
             id_paciente = validar_string('Digite o ID do Paciente: ')
             if create_consulta(id, especialidade, data_consulta, ativa, id_paciente):
                 print(f'\n Consulta {id} de especialidade {especialidade} foi agendada com sucesso!')
@@ -131,10 +123,11 @@ def main_consulta():
                 if consultas:
                     print("\n--- Lista de Consultas ---")
                     for c in consultas:
-                        print(f"ID: {c['id']}, Especialidade: {c['especialidade']}, Data: {c['data_consulta']}, Ativa: {c['ativa']}, ID Paciente: {c['id_paciente']}")
+                        data_formatada = c['data_consulta'].strftime('%d/%m/%Y %H:%M') if c['data_consulta'] else ''
+                        print(f"ID: {c['id']}, Especialidade: {c['especialidade']}, Data: {data_formatada}, Ativa: {c['ativa']}, ID Paciente: {c['id_paciente']}")
                         print('----------------------------------')
                 else:
-                    print("↪️ Nenhuma consulta encontrada.")
+                    print(" Nenhuma consulta encontrada.")
             else:
                 print(" Erro ao listar as consultas.")
 
@@ -143,7 +136,7 @@ def main_consulta():
             id = validar_string('Digite o Id da Consulta que deseja atualizar: ')
             nova_especialidade = validar_string('Digite a nova especialidade: ')
             nova_data_consulta = validar_data('Digite a nova data (DD/MM/AAAA HH:MM): ')
-            nova_ativa = validar_status_consulta()
+            nova_ativa = validar_sim_nao("Digite o status da consulta (s para ativa, n para inativa): ")
             novo_id_paciente = validar_string('Digite o novo Id do Paciente: ')
             
             if update_consulta(id, nova_especialidade, nova_data_consulta, nova_ativa, novo_id_paciente):
@@ -155,7 +148,7 @@ def main_consulta():
             print('\n*** Excluindo uma consulta ***')
             id = validar_string('Digite o Id da Consulta que deseja excluir: ')
             if delete_consulta(id):
-                print(f'\n A consulta {id} foi excluida com sucesso!')
+                print(f'\n A consulta {id} foi excluída com sucesso!')
             else:
                 print(f'\n Falha ao excluir. Nenhuma consulta com ID {id} foi encontrada ou ocorreu um erro.')
 

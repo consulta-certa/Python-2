@@ -1,6 +1,6 @@
 import oracledb
 import json
-from utilitarios import getConnection, validar_string, validar_inteiro, validar_id
+from utilitarios import getConnection, validar_string, validar_inteiro, validar_id, validar_sim_nao
 
 def create_conversa_chatbot(id, id_paciente, pergunta, aprovacao):
     """Insere um novo registro de conversa e retorna True em caso de sucesso."""
@@ -90,14 +90,6 @@ def exportar_conversas_chatbot_json():
         print(f'Erro ao escrever o arquivo JSON: {e}')
         return False
 
-def validar_aprovacao():
-    while True:
-        aprovacao = input("Digite a aprovação (s/n): ").lower()
-        if aprovacao in ('s', 'n'):
-            return aprovacao
-        else:
-            print("Opção inválida. Por favor, digite 's' ou 'n'.")
-
 def main_conversa_chatbot():
     while True:
         print('\n**Menu - Conversas com Chatbot**')
@@ -114,7 +106,7 @@ def main_conversa_chatbot():
             id = validar_id()
             id_paciente = validar_string("Digite o ID do paciente: ")
             pergunta = validar_string('Digite a pergunta: ')
-            aprovacao = validar_aprovacao()
+            aprovacao = validar_sim_nao("Digite a aprovação (s/n): ")
             if create_conversa_chatbot(id, id_paciente, pergunta, aprovacao):
                 print(f'A conversa (ID: {id}) foi adicionada com sucesso!')
             else:
@@ -139,7 +131,7 @@ def main_conversa_chatbot():
             id = validar_string('Digite o Id da conversa com chatbot: ')
             novo_id_paciente = validar_string("Digite o novo ID do paciente: ")
             nova_pergunta = validar_string('Digite a nova pergunta: ')
-            nova_aprovacao = validar_aprovacao()
+            nova_aprovacao = validar_sim_nao("Digite a aprovação (s/n): ")
             if update_conversa_chatbot(id, novo_id_paciente, nova_pergunta, nova_aprovacao):
                 print(f'Os dados da conversa {id} foram atualizados com sucesso!')
             else:

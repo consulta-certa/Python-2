@@ -25,7 +25,7 @@ def read_avaliacao():
     try:
         with getConnection() as conn:
             with conn.cursor() as cursor:
-                sql = "SELECT id, nota, comentario, TO_CHAR(data_avaliacao, 'DD/MM/YYYY') FROM cc_avaliacoes ORDER BY data_avaliacao DESC"
+                sql = "SELECT id, nota, comentario, data_avaliacao FROM cc_avaliacoes ORDER BY data_avaliacao DESC"
                 cursor.execute(sql)
                 avaliacoes = []
                 for row in cursor.fetchall():
@@ -72,18 +72,18 @@ def delete_avaliacao(id):
 
 def exportar_avaliacoes_json():
     """Exporta as avaliações para JSON e retorna True em caso de sucesso."""
-    print('\n📤 Exportando dados das avaliações para JSON...')
+    print('\n Exportando dados das avaliações para JSON...')
     avaliacoes = read_avaliacao()
     if avaliacoes is None:
         print(' Não foi possível obter os dados para exportar.')
         return False
     if not avaliacoes:
-        print("↪️ Nenhuma avaliação encontrada para exportar.")
+        print(" Nenhuma avaliação encontrada para exportar.")
         return True
 
     try:
         with open('avaliacoes.json', 'w', encoding='utf-8') as f:
-            json.dump(avaliacoes, f, ensure_ascii=False, indent=4)
+            json.dump(avaliacoes, f, ensure_ascii=False, indent=4, default=str)
         print(' Dados exportados com sucesso para avaliacoes.json.')
         return True
     except IOError as e:
@@ -127,7 +127,7 @@ def main_avaliacao():
                         print(f"ID: {a['id']}, Nota: {a['nota']}, Comentário: {a['comentario']}, Data: {a['data_avaliacao']}")
                         print('----------------------------------')
                 else:
-                    print("↪️ Nenhuma avaliação encontrada.")
+                    print(" Nenhuma avaliação encontrada.")
             else:
                 print(" Erro ao listar as avaliações.")
 
@@ -151,7 +151,7 @@ def main_avaliacao():
             print('\n*** Excluindo uma avaliação ***')
             id = validar_string('Digite o Id da avaliação que deseja excluir: ')
             if delete_avaliacao(id):
-                print(f'\n A avaliação de ID: {id} foi excluida com sucesso!')
+                print(f'\n A avaliação de ID: {id} foi excluída com sucesso!')
             else:
                 print(f'\n Falha ao excluir. Nenhuma avaliação com ID {id} foi encontrada ou ocorreu um erro.')
 

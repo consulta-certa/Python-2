@@ -1,6 +1,6 @@
 import oracledb
 import json
-from utilitarios import getConnection, validar_nome, validar_inteiro, validar_email, validar_telefone, validar_string, validar_id
+from utilitarios import getConnection, validar_nome, validar_inteiro, validar_email, validar_telefone, validar_string, validar_id, validar_sim_nao
 
 def create_paciente(id, nome, email, senha, telefone, acompanhantes):
     """Insere um novo paciente no banco e retorna True em caso de sucesso."""
@@ -65,13 +65,13 @@ def delete_paciente(id):
 
 def exportar_pacientes_json():
     """Exporta os pacientes para um arquivo JSON e retorna True em caso de sucesso."""
-    print('\n📤 Exportando dados dos pacientes para JSON...')
+    print('\n Exportando dados dos pacientes para JSON...')
     pacientes = read_paciente()
     if pacientes is None:
         print(' Não foi possível obter os dados para exportar.')
         return False
     if not pacientes:
-        print("↪️ Nenhum paciente cadastrado para exportar.")
+        print(" Nenhum paciente cadastrado para exportar.")
         return True
 
     try:
@@ -82,14 +82,6 @@ def exportar_pacientes_json():
     except IOError as e:
         print(f' Erro ao escrever o arquivo JSON: {e}')
         return False
-
-def validar_acompanhantes():
-    while True:
-        acompanhantes = input("O paciente terá acompanhantes? (s/n): ").lower()
-        if acompanhantes in ('s', 'n'):
-            return acompanhantes
-        else:
-            print("Opção inválida. Por favor, digite 's' ou 'n'.")
 
 def main_paciente():
     while True:
@@ -109,7 +101,7 @@ def main_paciente():
             email = validar_email('Digite o email do paciente: ')
             senha = validar_string('Digite a senha do paciente: ')
             telefone = validar_telefone('Digite o telefone do paciente: ')
-            acompanhantes = validar_acompanhantes()
+            acompanhantes = validar_sim_nao("O paciente terá acompanhantes? (s/n): ")
             
             if create_paciente(id, nome, email, senha, telefone, acompanhantes):
                 print(f'\n Paciente {nome} (ID: {id}) foi adicionado com sucesso!')
@@ -126,7 +118,7 @@ def main_paciente():
                         print(f"ID: {p['id']}, Nome: {p['nome']}, Email: {p['email']}, Senha: {'*' * len(p['senha'])}, Telefone: {p['telefone']}, Acompanhantes: {p['acompanhantes']}")
                         print('----------------------------------')
                 else:
-                    print("↪️ Nenhum paciente encontrado.")
+                    print(" Nenhum paciente encontrado.")
             else:
                 print(" Erro ao listar os pacientes.")
 
@@ -137,7 +129,7 @@ def main_paciente():
             novo_email = validar_email('Digite o novo email do Paciente: ')
             nova_senha = validar_string('Digite a nova senha do Paciente:')
             novo_telefone = validar_telefone('Digite o novo telefone: ')
-            novo_acompanhantes = validar_acompanhantes()
+            novo_acompanhantes = validar_sim_nao("O paciente terá acompanhantes? (s/n): ")
             
             if update_paciente(id, novo_nome, novo_email, nova_senha, novo_telefone, novo_acompanhantes):
                 print(f'\n Os dados do Paciente {id} foram atualizados com sucesso!')
@@ -148,7 +140,7 @@ def main_paciente():
             print('\n*** Excluindo um Paciente ***')
             id = validar_string('Digite o Id do Paciente que deseja excluir: ')
             if delete_paciente(id):
-                print(f'\n O Paciente {id} foi excluido com sucesso!')
+                print(f'\n O Paciente {id} foi excluído com sucesso!')
             else:
                 print(f'\n Falha ao excluir. Nenhum Paciente com ID {id} foi encontrado ou ocorreu um erro.')
         
