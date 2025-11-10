@@ -1,76 +1,76 @@
 # Sistema Consulta Certa - Gerenciamento em Python com Oracle DB
 
-## Descrição
+## 📝 Descrição
 
-Este projeto implementa um sistema de gerenciamento para uma clínica fictícia chamada **Consulta Certa**, utilizando Python para realizar operações CRUD (Criar, Ler, Atualizar, Excluir) em diversas entidades relacionadas ao atendimento médico.
+Este projeto implementa um sistema de back-end em **Python** para gerenciar as operações de uma clínica fictícia chamada **Consulta Certa**. O sistema é robusto, modular e interage diretamente com um banco de dados **Oracle**, garantindo a persistência e a consistência dos dados.
 
-O sistema conecta-se a um banco de dados Oracle para persistência dos dados e oferece menus interativos para facilitar o uso.
-
----
-
-## Funcionalidades
-
-- Gerenciamento de **Pacientes**, **Acompanhantes**, **Consultas**, **Lembretes**, **Contatos**, **Avaliações**, **Conversas com Chatbot**, **Conteúdos** e **Acessos de Funcionalidade**.
-- Operações CRUD completas para cada entidade.
-- Validação robusta de dados de entrada (nomes, emails, telefones, datas, booleanos, etc.).
-- Tratamento de erros e exceções para garantir a integridade dos dados.
-- Menus interativos com submenus para facilitar a navegação.
-- Conexão com banco Oracle usando a biblioteca `oracledb`.
+A arquitetura foi desenhada para servir como a camada de dados para um sistema de front-end (como um site ou aplicativo móvel), oferecendo uma interface de linha de comando (CLI) para realizar todas as operações administrativas.
 
 ---
 
-## Requisitos
+## 🛠️ Tecnologias Utilizadas
 
-- Python 3.7 ou superior
-- Biblioteca `oracledb`
-- Biblioteca `regex`
+- **Linguagem:** Python 3
+- **Banco de Dados:** Oracle DB
+- **Bibliotecas Principais:**
+  - `oracledb`: Para conexão e comunicação com o banco de dados Oracle.
+  - `requests`: Para o consumo da API externa de busca de UBS.
+  - `json`: Para a exportação de dados.
 
-### Instalação das dependências
+---
 
-```
-pip install oracledb regex
-```
+## ✨ Funcionalidades Principais
 
-### Como usar
-Configure o arquivo utilitarios.py com as credenciais corretas do banco Oracle (usuário, senha, host, porta e service_name).
+- **Gerenciamento Completo (CRUD):**
+  - Módulos completos para gerenciar **Pacientes, Acompanhantes, Consultas, Lembretes, Contatos, Avaliações, Conversas com Chatbot, Conteúdos e Acessos**.
+  - Cada módulo permite **Inserir, Consultar, Atualizar e Excluir** registros.
 
+- **Validação de Dados:**
+  - Um módulo de utilitários centraliza a validação de todas as entradas, como e-mails, telefones, CEPs, datas e outros formatos, garantindo a integridade dos dados.
 
-## Execute o arquivo principal main.py:
-```
-python main.py
-```
-Navegue pelo menu principal para acessar os submenus de cada entidade.
+- **Exportação de Dados:**
+  - Todos os módulos de CRUD incluem uma funcionalidade para **exportar os dados consultados para um arquivo `.json`**, facilitando a integração e a análise de dados.
 
-Utilize as opções para inserir, listar, atualizar ou excluir registros.
+- **Consumo de API Externa:**
+  - O sistema consome uma **API REST externa** (hospedada no Render) para buscar Unidades Básicas de Saúde (UBS) próximas a um CEP informado.
 
-## Estrutura do projeto
-utilitarios.py: funções utilitárias para conexão com banco e validação de dados.
-paciente.py: CRUD e menu para pacientes.
-acompanhante.py: CRUD e menu para acompanhantes.
-consulta.py: CRUD e menu para consultas.
-lembrete.py: CRUD e menu para lembretes.
-contato.py: CRUD e menu para contatos.
-avaliacao.py: CRUD e menu para avaliações.
-conversa_chatbot.py: CRUD e menu para conversas com chatbot.
-conteudo.py: CRUD e menu para conteúdos.
-acesso_funcionalidade.py: CRUD e menu para acessos de funcionalidade.
-main.py: menu principal que integra todos os módulos.
+- **Menus Interativos:**
+  - Uma interface de linha de comando (CLI) com menus e submenus que guiam o usuário de forma intuitiva através das operações.
 
-## Observações
-As validações garantem que os dados inseridos estejam no formato correto, evitando erros no banco.
-O sistema foi desenvolvido para fins acadêmicos e pode ser expandido conforme necessidade.
-As senhas dos pacientes são armazenadas em texto puro no banco, o que não é recomendado para ambientes reais. Para produção, utilize hashing seguro (Proximos Passos).
+---
 
+## 🚀 Como Executar o Projeto
 
-## Autores
-Felipe Ferrete
-- RM562999
+1.  **Pré-requisitos:**
+    - Ter o Python 3 instalado.
+    - Ter acesso a um banco de dados Oracle e as credenciais de conexão.
+    - Instalar as bibliotecas necessárias:
+      ```bash
+      pip install oracledb requests
+      ```
 
-Gustavo Bosak
-- RM566315
+2.  **Configuração:**
+    - Atualize as credenciais de conexão com o banco de dados no arquivo `utilitarios.py` ou onde a função `getConnection` estiver definida.
 
-Nikolas Brisola
-- RM564371
+3.  **Execução:**
+    - Para iniciar o sistema, execute o arquivo `main.py` no seu terminal:
+      ```bash
+      python main.py
+      ```
+    - Navegue pelos menus para acessar as funcionalidades desejadas.
 
-## Vídeo explicativo - YOUTUBE
-Link para o vídeo explicativo do projeto: https://youtu.be/IXAUbEz6NIw
+---
+
+## 👨‍💻 Autores
+
+- **Felipe Ferrete** - RM562999
+- **Gustavo Bosak** - RM566315
+- **Nikolas Brisola** - RM564371
+
+---
+
+## 🎥 Vídeo Explicativo - YouTube
+
+Assista à nossa demonstração completa do projeto, explicando a arquitetura do código e mostrando o sistema em ação:
+
+**[Link para o vídeo explicativo do projeto](https://youtu.be/IXAUbEz6NIw)**
