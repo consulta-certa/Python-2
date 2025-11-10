@@ -8,8 +8,7 @@ from conversa_chatbot import main_conversa_chatbot
 from conteudo import main_conteudo
 from acesso_funcionalidade import main_acesso
 from utilitarios import validar_inteiro
-from api_ubs_client import buscar_ubs_por_cep
-
+from api_ubs_client import main_api_ubs_client
 
 
 def exibir_menu():
@@ -26,7 +25,7 @@ def exibir_menu():
     print("7.  Gerenciar Conversas Chatbot.")
     print("8.  Gerenciar Conteúdos.")
     print("9.  Gerenciar Acessos de Funcionalidade")
-    print("10. Gerenciar Integrações (Buscar ubs perto)")
+    print("10. Buscar UBS por CEP.")
     print("0. Sair: Encerra o Sistema Consulta Certa.")
     print("="*40)
 
@@ -56,12 +55,12 @@ def main():
         elif opcao == 9:
             main_acesso()
         elif opcao == 10:
-            buscar_ubs_por_cep()
+            main_api_ubs_client()
         elif opcao == 0:
-            print("\n👋 Encerrando o sistema... até logo!")
+            print("\nEncerrando o sistema... até logo!")
             break
         else:
-            print("\nOpção inválida. Tente novamente com um número inteiro entre 0 e 9.")
+            print("\nOpção inválida. Tente novamente com um número inteiro entre 0 e 10.")
 
 
 if __name__ == "__main__":

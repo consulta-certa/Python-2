@@ -1,155 +1,95 @@
 import oracledb
 import json
-from utilitarios import getConnection,validar_string,validar_inteiro,validar_data, validar_id
+from utilitarios import getConnection, validar_string, validar_inteiro, validar_data, validar_id
 
-#Operações CRUD
 def create_lembrete(id, data_envio, enviado, id_consulta):
-    print('*** Inserindo um novo lembrete na tabela cc_lembretes ***')
-    conn = getConnection()
-
-    if not conn:
-        return
-    
+    """Cria um novo lembrete e retorna True em caso de sucesso."""
     try:
-        cursor = conn.cursor()
-        sql = """
-            INSERT INTO cc_lembretes (id, data_envio, enviado, id_consulta)
-            VALUES (:id, :data_envio, :enviado, :id_consulta)
-        """
-        cursor.execute(sql, {
-            'id' : id,
-            'data_envio' : data_envio,
-            'enviado': enviado,
-            'id_consulta' : id_consulta
-        })
-        conn.commit()
-        print(f' O Lembrete {id} da consulta: {id_consulta} foi adicionado com sucesso!')
+        with getConnection() as conn:
+            with conn.cursor() as cursor:
+                sql = """
+                    INSERT INTO cc_lembretes (id, data_envio, enviado, id_consulta)
+                    VALUES (:id, :data_envio, :enviado, :id_consulta)
+                """
+                cursor.execute(sql, {
+                    'id': id, 'data_envio': data_envio, 'enviado': enviado, 'id_consulta': id_consulta
+                })
+                conn.commit()
+                return True
     except oracledb.Error as e:
-        print(f'\nErro ao inserior lembrete: {e}')
-        conn.rollback()
-    finally:
-        if conn:
-            conn.close()    
+        print(f'\n Erro ao criar lembrete: {e}')
+        return False
 
-#Exibir os dados de todos os Lembretes
 def read_lembrete():
-    print('*** Lê e exibe todos os lembretes da tabela ***')
-    conn = getConnection()
-    if not conn:
-        return
-    
+    """Lê e retorna uma lista de todos os lembretes."""
     try:
-        cursor = conn.cursor()
-        sql = """
-            SELECT id, data_envio, enviado, id_consulta
-            FROM cc_lembretes ORDER BY data_envio DESC
-        """
-        cursor.execute(sql)
-        print("\n --- Lista de lembretes ---")
-        rows = cursor.fetchall()
-        for row in rows:
-            print(f'ID: {row[0]}, Data Envio: {row[1].strftime("%d/%m/%Y %H:%M")}, Enviado: {row[2]}, ID Consulta: {row[3]}')
-            print('----------------------------------')
+        with getConnection() as conn:
+            with conn.cursor() as cursor:
+                sql = "SELECT id, data_envio, enviado, id_consulta FROM cc_lembretes ORDER BY data_envio DESC"
+                cursor.execute(sql)
+                lembretes = []
+                for row in cursor.fetchall():
+                    lembretes.append({
+                        'id': row[0], 'data_envio': row[1].strftime("%d/%m/%Y %H:%M"),
+                        'enviado': row[2], 'id_consulta': row[3]
+                    })
+                return lembretes
     except oracledb.Error as e:
-        print(f'\nErro ao ler lembretes: {e}')
-    finally:
-        if conn:
-            conn.close()
+        print(f'\n Erro ao ler lembretes: {e}')
+        return None
 
-
-#Update
-#Atualizar um dado de um lembrete
 def update_lembrete(id, nova_data_envio, novo_enviado, novo_id_consulta):
-    print(f'Atualizando os dados do lembrete pelo ID')
-
-    conn = getConnection()
-    if not conn:
-        return
-    
+    """Atualiza um lembrete e retorna True em caso de sucesso."""
     try:
-        cursor = conn.cursor()
-        sql = """
-        UPDATE cc_lembretes
-        SET data_envio = :nova_data_envio, enviado = :novo_enviado, id_consulta = :novo_id_consulta WHERE id = :id
-        """
-        cursor.execute(sql, {'nova_data_envio' : nova_data_envio, 'novo_enviado' :novo_enviado, 'novo_id_consulta' : novo_id_consulta, 'id': id})
-        conn.commit()
-        if cursor.rowcount >0:
-            print(f'Os dados do lembrete de ID {id} foram atualizados!')
-        else:
-            print(f' Nenhum lembrete com ID {id} foi encontrado')
-
-
+        with getConnection() as conn:
+            with conn.cursor() as cursor:
+                sql = """
+                    UPDATE cc_lembretes
+                    SET data_envio = :nova_data_envio, enviado = :novo_enviado, id_consulta = :novo_id_consulta
+                    WHERE id = :id
+                """
+                cursor.execute(sql, {
+                    'nova_data_envio': nova_data_envio, 'novo_enviado': novo_enviado,
+                    'novo_id_consulta': novo_id_consulta, 'id': id
+                })
+                conn.commit()
+                return cursor.rowcount > 0
     except oracledb.Error as e:
-        print(f'Erro ao atualizar dado {e}')
-        conn.rollback()
+        print(f'\n Erro ao atualizar lembrete: {e}')
+        return False
 
-    finally:
-        if conn:
-            conn.close()
-
-#DELETE
-#remove um lembrete pelo Id
 def delete_lembrete(id):
-    print(f' Excluindo o lembrete com id: {id}')
-
-    conn = getConnection()
-
-    if not conn:
-        return
-    
+    """Exclui um lembrete e retorna True em caso de sucesso."""
     try:
-        cursor = conn.cursor()
-        sql = """DELETE FROM cc_lembretes WHERE id = :id"""
-        cursor.execute(sql, {'id' : id})
-        conn.commit()
-        if cursor.rowcount >0:
-            print(f'O lembrete {id} foi excluido com sucesso!')
-        else:
-            print(f'Nenhum lembrete com ID {id} foi encontrado')
-        
+        with getConnection() as conn:
+            with conn.cursor() as cursor:
+                sql = "DELETE FROM cc_lembretes WHERE id = :id"
+                cursor.execute(sql, {'id': id})
+                conn.commit()
+                return cursor.rowcount > 0
     except oracledb.Error as e:
-        print(f'Erro ao Excluir lembrete: {e}')
-        conn.rollback()
-        
-    finally:
-        if conn:
-            conn.close()
+        print(f'\n Erro ao excluir lembrete: {e}')
+        return False
 
 def exportar_lembretes_json():
-    '''
-    Exporta todos os lembretes cadastrados no banco Oracle
-    para um arquivo local 'lembretes.json'.
-    '''
+    """Exporta os lembretes para JSON e retorna True em caso de sucesso."""
     print('\n📤 Exportando dados dos lembretes para JSON...')
-
-    conn = getConnection()
-    if not conn:
-        print('Não foi possível conectar ao banco.')
-        return
+    lembretes = read_lembrete()
+    if lembretes is None:
+        print(' Não foi possível obter os dados para exportar.')
+        return False
+    if not lembretes:
+        print("↪️ Nenhum lembrete encontrado para exportar.")
+        return True
 
     try:
-        cursor = conn.cursor()
-        cursor.execute("""
-            SELECT id, TO_CHAR(data_envio, 'DD/MM/YYYY HH24:MI:SS') as data_formatada, enviado, id_consulta
-            FROM cc_lembretes ORDER BY data_envio DESC
-        """)
-        rows = cursor.fetchall()
-
-        lembretes = [
-            {'id': row[0], 'data_envio': row[1],'enviado': row[2], 'id_consulta': row[3]}
-            for row in rows
-        ]
-
         with open('lembretes.json', 'w', encoding='utf-8') as f:
             json.dump(lembretes, f, ensure_ascii=False, indent=4)
-
-        print('Dados exportados com sucesso para lembretes.json.')
-
-    except Exception as e:
-        print(f'Erro ao exportar: {e}')
-    finally:
-        conn.close()
+        print(' Dados exportados com sucesso para lembretes.json.')
+        return True
+    except IOError as e:
+        print(f' Erro ao escrever o arquivo JSON: {e}')
+        return False
 
 def validar_enviado():
     while True:
@@ -159,11 +99,8 @@ def validar_enviado():
         else:
             print("Opção inválida. Por favor, digite 's' ou 'n'.")
 
-#Programa Principal
 def main_lembrete():
-
     while True:
-
         print('\n**Menu - Lembretes de Consulta**')
         print('1. Inserir um novo lembrete')
         print('2. Listar todos os lembretes')
@@ -172,36 +109,60 @@ def main_lembrete():
         print('5. Exportar Lembretes para Json')
         print('6. Voltar ao menu principal')
 
-        opcao=validar_inteiro('Digite uma opção entre 1 e 6: ')
+        opcao = validar_inteiro('Digite uma opção entre 1 e 6: ')
         if opcao == 1:
+            print('\n*** Inserindo um novo lembrete ***')
             id = validar_id()
             data_envio = validar_data('Digite a data e hora de envio (DD/MM/AAAA HH:MM): ')
             enviado = validar_enviado()
             id_consulta = validar_string('Digite o ID da consulta relacionada: ')
-            create_lembrete(id, data_envio, enviado, id_consulta)
-    
-        elif opcao==2:
-            read_lembrete()
-            
+            if create_lembrete(id, data_envio, enviado, id_consulta):
+                print(f'\n Lembrete {id} da consulta {id_consulta} foi adicionado com sucesso!')
+            else:
+                print('\n Falha ao adicionar o lembrete.')
+
+        elif opcao == 2:
+            print('\n*** Listando todos os lembretes ***')
+            lembretes = read_lembrete()
+            if lembretes is not None:
+                if lembretes:
+                    print("\n--- Lista de Lembretes ---")
+                    for l in lembretes:
+                        print(f"ID: {l['id']}, Data Envio: {l['data_envio']}, Enviado: {l['enviado']}, ID Consulta: {l['id_consulta']}")
+                        print('----------------------------------')
+                else:
+                    print("↪️ Nenhum lembrete encontrado.")
+            else:
+                print(" Erro ao listar os lembretes.")
+
         elif opcao == 3:
+            print('\n*** Atualizando um lembrete ***')
             id = validar_string('Digite o Id do lembrete que deseja atualizar: ')
             nova_data_envio = validar_data('Digite a nova data e hora de envio (DD/MM/AAAA HH:MM): ')
             novo_enviado = validar_enviado()
             novo_id_consulta = validar_string('Digite o novo ID da consulta relacionada: ')
-            update_lembrete(id, nova_data_envio, novo_enviado, novo_id_consulta)
+            
+            if update_lembrete(id, nova_data_envio, novo_enviado, novo_id_consulta):
+                print(f'\n Os dados do lembrete {id} foram atualizados com sucesso!')
+            else:
+                print(f'\n Falha ao atualizar. Nenhum lembrete com ID {id} foi encontrado ou ocorreu um erro.')
 
-        elif opcao==4:
+        elif opcao == 4:
+            print('\n*** Excluindo um lembrete ***')
             id = validar_string('Digite o Id do lembrete que deseja excluir: ')
-            delete_lembrete(id)
+            if delete_lembrete(id):
+                print(f'\n O lembrete {id} foi excluido com sucesso!')
+            else:
+                print(f'\n Falha ao excluir. Nenhum lembrete com ID {id} foi encontrado ou ocorreu um erro.')
 
         elif opcao == 5:
             exportar_lembretes_json()
-    
+
         elif opcao == 6:
-            print('Encerrando o programa... volte sempre')
+            print('\nRetornando ao menu principal...')
             break
         else:
-            print("Opção inválida. Tente novamente com um número inteiro entre 1 e 6.")
+            print("\n Opção inválida. Tente novamente com um número inteiro entre 1 e 6.")
 
 if __name__ == "__main__":
     main_lembrete()
